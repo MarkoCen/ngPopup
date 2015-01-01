@@ -4,13 +4,14 @@ ngPopup is a jQuery-independent modeless dialog, it has only dependency on [Angu
 
 ##Install
 
-First [download] javascript file or install througth [Bower]
+First [download] ```ngPopup.js``````ngPopupStyle.css```, or install througth [Bower]
 ```
 bower install ng-popup
 ```
 Include it in your html page :
 
 ```html
+<link rel='stylesheet' href='ngPopupStyle.css'>
 <script src='ngPopup.js'></script>
 ```
 
