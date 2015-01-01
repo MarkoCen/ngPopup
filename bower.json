@@ -3,9 +3,30 @@
   "description": "A modeless dialog for AngularJS",
   "version": "0.1.0",
   "homepage": "https://github.com/MarkoCen/ngPopup",
+  "main": "dist/ngPopup.js",
   "license": "MIT",
   "private": false,
+  "ignore":[
+    "css",
+    "directive",
+    "e2e-tests",
+    "lib",
+    "model",
+    "views",
+    ".bowerrc",
+    ".gitattributes",
+    ".gitignore",
+    ".jshintignore",
+    ".jshintrc",
+    ".travis.yml",
+    "app.js",
+    "karma.conf.js",
+    "bower.json",
+    "gruntfile.js",
+    "package.json",
+    "README.md"
+  ],
   "dependencies": {
-    "angular": "1.2.x"
+    "angular": ">=1.2.x"
   }
 }
