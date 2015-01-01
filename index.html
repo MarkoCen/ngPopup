@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="css/ngPopupStyle.css">
+    <script src="./lib/angular.js"></script>
+
+</head>
+<body ng-app="ngPopup">
+
+    <div ng-controller="myCtrl" style="height:10000px;">
+
+        <ng-pop-up option="config"></ng-pop-up>
+
+        <button ng-click="close()">close</button>
+        <button ng-click="myDialog.open()">open</button><br>
+        Top <input ng-model="newTop">
+        Left <input ng-model="newLeft">
+        <button ng-click="myDialog.open({'top':newTop, 'left':newLeft})">Set New Position</button>
+    </div>
+
+
+    <script src="app.js"></script>
+
+    <script src="model/ngPopupBuilder.js"></script>
+    <script src="directive/ngPopupDirective.js"></script>
+
+    <script src="controller/ngPopupCtrl.js"></script>
+    <script>
+
+        ngPopup.controller("myCtrl", function($scope){
+            $scope.items = [
+                {title:"hello1"},
+                {title:"hello2"},
+                {title:"hello3"},
+                {title:"hello4"}
+            ]
+            $scope.cen = { test:"dsad"}
+
+            $scope.config = {
+                modelName:"myDialog",
+                width: 500,
+                height:500,
+//                templateUrl:"../views/test.html",
+                templateUrl: "http://www.json-generator.com/api/json/get/cnmzaPRlfm?indent=2",
+                resizable:true,
+                draggable:true,
+                position: { top : 500, left : 500}
+            }
+
+
+            $scope.close = function(){
+                $scope.myDialog.close();
+            }
+        })
+    </script>
+
+
+</body>
+</html>
