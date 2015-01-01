@@ -37,10 +37,13 @@ $scope.ngPopupConfig = {
     templateUrl:"../views/ngPopupContents.html",
     resizable:true,
     draggable:true,
-    position: { top : 500, left : 500}
+    position: { top : 500, left : 500},
+    onOpen: function(){
+    	/*Some Logic...*/
+    }
 }
 ```
-3 Call dialog within controller by ```$scope.modelName``` :
+3 Call dialog methods by ```$scope.modelName``` :
 ```javascript
 $scope.myNgPopup.open();
 ```
