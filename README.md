@@ -1,6 +1,6 @@
 #ngPopup
 -----
-ngPopup is a jQuery-independent modeless dialog, it has only dependency on [AngularJS], it is super easy to use with fully customized theme.
+ngPopup is a jQuery-independent modeless dialog, it has only dependency on [AngularJS], it has super easy-to-use options and methods, with fully customized theme.
 
 ##Install
 
