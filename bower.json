@@ -1,15 +1,11 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
-  "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
+  "name": "ngPopup",
+  "description": "A modeless dialog for AngularJS",
+  "version": "0.1.0",
+  "homepage": "https://github.com/MarkoCen/ngPopup",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "dependencies": {
-    "angular": "1.2.x",
-    "angular-route": "1.2.x",
-    "angular-loader": "1.2.x",
-    "angular-mocks": "~1.2.x",
-    "html5-boilerplate": "~4.3.0"
+    "angular": "1.2.x"
   }
 }
