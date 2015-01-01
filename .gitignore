@@ -6,5 +6,4 @@ tmp
 .DS_Store
 .idea
 e2e-tests/
-index
 views/
