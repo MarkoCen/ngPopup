@@ -7,7 +7,6 @@
   "license": "MIT",
   "private": false,
   "ignore":[
-    "css",
     "directive",
     "e2e-tests",
     "lib",
