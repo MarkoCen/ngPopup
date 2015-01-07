@@ -15,27 +15,26 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 xmlHttpRequest.open("GET", option.templateUrl, false);
                 xmlHttpRequest.send(null);
             }
-            console.log(option)
             html = '<div class="container">' +
-                    '<div class="resizeCorner">' +
-                    '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
-                    '</div>' +
-                    '<div class="resizeBar">' +
-                    '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
-                    '</div>' +
-                    '<div class="titleBar">' +
-                    '<div class="iconGroup">' +
-                    '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
-                    '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +
-                    '<span class="glyphicon glyphicon-resize-small" ng-click=' + option.modelName + '.togglePin($event)></span>' +
-                    '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
-                    '</div>' +
-                    '</div>' +
-                    '<div class="content">' +
-                        templateHtml +
-                        templateUrlHtml +
-                    '</div>' +
-                    '</div>';
+            '<div class="resizeCorner">' +
+            '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+            '</div>' +
+            '<div class="resizeBar">' +
+            '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+            '</div>' +
+            '<div class="titleBar">' +
+            '<div class="iconGroup">' +
+            '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
+            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +
+            '<span class="glyphicon glyphicon-resize-small" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+            '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="content">' +
+            templateHtml +
+            templateUrlHtml +
+            '</div>' +
+            '</div>';
 
             return html;
 
@@ -90,7 +89,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 isMinimized: function(){
                     return ($element.getElementsByClassName('content')[0].style.display != 'none') ? false : true;
                 }
-            }
+            };
 
             return fun;
         },
@@ -116,11 +115,11 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 onDragEnd : function(){},
                 onResize : function(){}
 
-            }
+            };
 
             return defaultOption;
         }
-    }
+    };
 
     return ngPopupBuilder;
-})
+});

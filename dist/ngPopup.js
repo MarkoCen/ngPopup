@@ -17,7 +17,6 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 xmlHttpRequest.open("GET", option.templateUrl, false);
                 xmlHttpRequest.send(null);
             }
-            console.log(option)
             html = '<div class="container">' +
             '<div class="resizeCorner">' +
             '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
@@ -92,7 +91,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 isMinimized: function(){
                     return ($element.getElementsByClassName('content')[0].style.display != 'none') ? false : true;
                 }
-            }
+            };
 
             return fun;
         },
@@ -118,20 +117,20 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 onDragEnd : function(){},
                 onResize : function(){}
 
-            }
+            };
 
             return defaultOption;
         }
-    }
+    };
 
     return ngPopupBuilder;
-})
+});
 ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, ngPopupBuilder){
 
     return{
         restrict: "EA",
         scope:{
-            option:"&?"
+            option:"="
         },
         replace:true,
         template:'<div class="ngPopup"></div>',
@@ -139,16 +138,20 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
             var $element = element[0];
             var $option = ngPopupBuilder.getDefaultOptions();
-            $option = scope.option();
+            $option = scope.option;
+
+            scope.$parent.$watch(attrs.option,function(value){
+                $element.style.position = 'absolute';
+                $element.style.width = $option.width + 'px';
+                $element.style.height = $option.height + 'px';
+                $element.style.top = $option.position.top + 'px';
+                $element.style.left = $option.position.left + 'px';
+            },true)
 
             var modelName = $parse($option.modelName);
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods(element));
 
-            $element.style.position = 'absolute';
-            $element.style.width = $option.width + 'px';
-            $element.style.height = $option.height + 'px';
-            $element.style.top = $option.position.top + 'px';
-            $element.style.left = $option.position.left + 'px';
+
 
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
@@ -265,4 +268,4 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
         }
 
     }
-})
+});

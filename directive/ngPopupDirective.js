@@ -3,7 +3,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
     return{
         restrict: "EA",
         scope:{
-            option:"&?"
+            option:"="
         },
         replace:true,
         template:'<div class="ngPopup"></div>',
@@ -11,16 +11,20 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
             var $element = element[0];
             var $option = ngPopupBuilder.getDefaultOptions();
-            $option = scope.option();
+            $option = scope.option;
+
+            scope.$parent.$watch(attrs.option,function(value){
+                $element.style.position = 'absolute';
+                $element.style.width = $option.width + 'px';
+                $element.style.height = $option.height + 'px';
+                $element.style.top = $option.position.top + 'px';
+                $element.style.left = $option.position.left + 'px';
+            },true)
 
             var modelName = $parse($option.modelName);
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods(element));
 
-            $element.style.position = 'absolute';
-            $element.style.width = $option.width + 'px';
-            $element.style.height = $option.height + 'px';
-            $element.style.top = $option.position.top + 'px';
-            $element.style.left = $option.position.left + 'px';
+
 
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
@@ -42,8 +46,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                     $document.find('body').addClass('unselectable');
                     $document.bind("mousemove", function (event) {
 
-                            $element.style.top = event.pageY - origY + targetTop + "px";
-                            $element.style.left = event.pageX - origX + targetLeft + "px";
+                        $element.style.top = event.pageY - origY + targetTop + "px";
+                        $element.style.left = event.pageX - origX + targetLeft + "px";
 
                     })
                 }
