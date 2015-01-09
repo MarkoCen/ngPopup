@@ -17,7 +17,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 $element.style.height = $option.height + 'px';
                 $element.style.top = $option.position.top + 'px';
                 $element.style.left = $option.position.left + 'px';
-                if($option.onResize){
+                if($option.onResize && (newValue.width != oldValue && newValue.height != oldValue.height)){
                     $option.onResize();
                 }
             },true)

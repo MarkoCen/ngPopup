@@ -10,16 +10,16 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
             var $element = element[0];
             $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
 
-            scope.$watch(attrs.option,function(value){
+            scope.$watch(attrs.option,function(newValue, oldValue){
                 $element.style.position = 'absolute';
                 $element.style.width = $option.width + 'px';
                 $element.style.height = $option.height + 'px';
                 $element.style.top = $option.position.top + 'px';
                 $element.style.left = $option.position.left + 'px';
-                if($option.onResize){
+                if($option.onResize && (newValue.width != oldValue && newValue.height != oldValue.height)){
                     $option.onResize();
                 }
-            },true)
+            },true);
 
             var modelName = $parse($option.modelName);
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
