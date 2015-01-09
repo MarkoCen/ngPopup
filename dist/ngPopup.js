@@ -42,7 +42,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
 
 
         },
-        getDefaultMethods: function(element){
+        getDefaultMethods: function(options,element,scope){
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
@@ -61,11 +61,20 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     $element.style.left = window.screenLeft ? window.screenLeft : window.screenX +10 + "px";
                     $element.style.width = window.innerWidth - 30+ "px";
                     $element.style.height = window.innerHeight - 30 + "px";
+                    //this.updateParentScopeOptions(options,$element);
+                    options.position.top =  $element.offsetTop;
+                    options.position.left = $element.offsetLeft;
+                    options.width = $element.offsetWidth;
+                    options.height = $element.offsetHeight;
                 },
                 minimize: function(){
                     $element.getElementsByClassName('content')[0].style.display = 'none';
                     $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
                     $element.style.width = '200px';
+                    options.position.top =  $element.offsetTop;
+                    options.position.left = $element.offsetLeft;
+                    options.width = $element.offsetWidth;
+                    options.height = $element.offsetHeight;
                 },
                 togglePin: function(event){
                     if($option.pinned != true){
@@ -120,6 +129,17 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             };
 
             return defaultOption;
+        },
+        callParentScopeApply: function(scope){
+            if(!scope.$$phase){
+                scope.$apply()
+            }
+        },
+        updateParentScopeOptions: function(options,element){
+            options.position.top =  element.offsetTop;
+            options.position.left = element.offsetLeft;
+            options.width = element.offsetWidth;
+            options.height = element.offsetHeight;
         }
     };
 
@@ -129,18 +149,15 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
     return{
         restrict: "EA",
-        scope:{
-            option:"="
-        },
+        scope:true,
         replace:true,
         template:'<div class="ngPopup"></div>',
         link: function(scope, element, attrs){
 
             var $element = element[0];
-            var $option = ngPopupBuilder.getDefaultOptions();
-            $option = scope.option;
+            $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
 
-            scope.$parent.$watch(attrs.option,function(value){
+            scope.$watch(attrs.option,function(value){
                 $element.style.position = 'absolute';
                 $element.style.width = $option.width + 'px';
                 $element.style.height = $option.height + 'px';
@@ -149,9 +166,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
             },true)
 
             var modelName = $parse($option.modelName);
-            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods(element));
-
-
+            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
 
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
@@ -175,9 +190,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                         $element.style.top = event.pageY - origY + targetTop + "px";
                         $element.style.left = event.pageX - origX + targetLeft + "px";
-                        scope.$parent.$eval(attrs.option).position.top =  event.pageY - origY + targetTop;
-                        scope.$parent.$eval(attrs.option).position.left = event.pageX - origX + targetLeft;
-                        scope.$parent.$apply();
+                        ngPopupBuilder.updateParentScopeOptions($option,$element);
+                        ngPopupBuilder.callParentScopeApply(scope.$parent);
                     })
                 }
 
@@ -190,9 +204,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                             $element.style.height = event.pageY - $element.offsetTop  + "px";
                             $element.style.width =  event.pageX - $element.offsetLeft + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass("right-top-corner")){
@@ -201,9 +214,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth + event.pageX - origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass("left-top-corner")){
@@ -213,9 +225,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass("left-bottom-corner")){
@@ -224,9 +235,8 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.left = event.pageX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
 
@@ -240,37 +250,32 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                         $document.bind("mousemove", function (event) {
                             $element.style.left = targetLeft + event.pageX - origX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
-                            scope.$parent.$eval(attrs.option).position.left = event.pageX - origX + targetLeft;
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass('right-bar')){
                         $document.bind("mousemove", function (event) {
 
                             $element.style.width = targetWidth + event.pageX - origX + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
+
                         })
                     }
                     else if(target.hasClass('top-bar')){
                         $document.bind("mousemove", function (event) {
                             $element.style.top = event.pageY + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            scope.$parent.$eval(attrs.option).position.top =  event.pageY - origY + targetTop;
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass('bottom-bar')){
                         $document.bind("mousemove", function (event) {
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            scope.$parent.$eval(attrs.option).width =  $element.offsetWidth;
-                            scope.$parent.$eval(attrs.option).height = $element.offsetHeight;
-                            scope.$parent.$apply();
+                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                 }
