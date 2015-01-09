@@ -1,7 +1,8 @@
 #angular-popup
 -----
-angular-popup is a jQuery-independent modal / modeless dialog, it has only dependency on [AngularJS], it has super easy-to-use options and methods, with fully customized theme.
 
+angular-popup is a jQuery-independent modal / modeless dialog, it has only dependency on AngularJS, it has super easy-to-use options and methods, with fully customized theme.
+[Demo]
 ##Install
 
 First [download] ```ngPopup.js``` ```ngPopupStyle.css```, or install througth [Bower]
@@ -55,3 +56,4 @@ $scope.myNgPopup.open();
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
 [Bower]:http://bower.io/
 [AngularJS]:https://angularjs.org/
+[Demo]:http://markocen.com/ngPopupDemo.html
