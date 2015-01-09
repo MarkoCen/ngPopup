@@ -1,5 +1,4 @@
-var ngPopup = angular.module("ngPopup",[])
-ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, ngPopupBuilder){
+var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, ngPopupBuilder){
 
     return{
         restrict: "EA",
@@ -11,7 +10,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
             var $element = element[0];
             $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
 
-            scope.$watch(attrs.option,function(value){
+            scope.$watch(attrs.option,function(newValue, oldValue){
                 $element.style.position = 'absolute';
                 $element.style.width = $option.width + 'px';
                 $element.style.height = $option.height + 'px';
@@ -20,7 +19,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 if($option.onResize && (newValue.width != oldValue && newValue.height != oldValue.height)){
                     $option.onResize();
                 }
-            },true)
+            },true);
 
             var modelName = $parse($option.modelName);
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
@@ -179,8 +178,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
         }
 
     }
-});
-ngPopup.factory("ngPopupBuilder", function($q, $http){
+}); ngPopup.factory("ngPopupBuilder", function($q, $http){
     var ngPopupBuilder = {
         layoutInit: function(option){
             var templateHtml = (option.template) ? option.template : '';
@@ -205,7 +203,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
             '</div>' +
             '<div class="titleBar">' +
-            '<span class="title">'+option.title+'</span>' +
+                '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
             '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
             '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +

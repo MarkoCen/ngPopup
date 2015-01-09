@@ -1,1 +1,1 @@
-var ngPopup = angular.module("ngPopup",[ ])
+var ngPopup = angular.module("ngPopup",[ ]);
