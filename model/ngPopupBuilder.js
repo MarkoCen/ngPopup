@@ -90,6 +90,9 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     }
 
                 },
+                setTitle: function(newTitle){
+                    $element.getElementsByClassName('title')[0].innerHTML = newTitle;
+                },
                 isOpened: function(){
                     return ($element.style.display != 'none') ? true : false;
                 },
