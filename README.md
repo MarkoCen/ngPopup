@@ -2,6 +2,7 @@
 -----
 
 angular-popup is a jQuery-independent modal / modeless dialog, it has only dependency on AngularJS, it has super easy-to-use options and methods, with fully customized theme.
+
 [Demo]
 ##Install
 
