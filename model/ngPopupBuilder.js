@@ -40,7 +40,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
 
 
         },
-        getDefaultMethods: function(element){
+        getDefaultMethods: function(options,element,scope){
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
@@ -59,11 +59,20 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     $element.style.left = window.screenLeft ? window.screenLeft : window.screenX +10 + "px";
                     $element.style.width = window.innerWidth - 30+ "px";
                     $element.style.height = window.innerHeight - 30 + "px";
+                    //this.updateParentScopeOptions(options,$element);
+                    options.position.top =  $element.offsetTop;
+                    options.position.left = $element.offsetLeft;
+                    options.width = $element.offsetWidth;
+                    options.height = $element.offsetHeight;
                 },
                 minimize: function(){
                     $element.getElementsByClassName('content')[0].style.display = 'none';
                     $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
                     $element.style.width = '200px';
+                    options.position.top =  $element.offsetTop;
+                    options.position.left = $element.offsetLeft;
+                    options.width = $element.offsetWidth;
+                    options.height = $element.offsetHeight;
                 },
                 togglePin: function(event){
                     if($option.pinned != true){
@@ -118,6 +127,17 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             };
 
             return defaultOption;
+        },
+        callParentScopeApply: function(scope){
+            if(!scope.$$phase){
+                scope.$apply()
+            }
+        },
+        updateParentScopeOptions: function(options,element){
+            options.position.top =  element.offsetTop;
+            options.position.left = element.offsetLeft;
+            options.width = element.offsetWidth;
+            options.height = element.offsetHeight;
         }
     };
 
