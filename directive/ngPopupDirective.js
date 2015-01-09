@@ -49,7 +49,11 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 }
 
                 if(target.parent().hasClass('resizeCorner')){
-                    if($option.resizable == false) { $document.find('body').removeClass('unselectable'); return;}
+                    if($option.resizable == false) {
+                        $document.find('body').removeClass('unselectable');
+
+                        return;
+                    }
 
                     $document.find('body').addClass('unselectable');
                     if(target.hasClass("right-bottom-corner")){

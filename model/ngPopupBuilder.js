@@ -4,7 +4,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             var templateHtml = (option.template) ? option.template : '';
             var templateUrlHtml = '';
             var html = null;
-
+            console.log(option)
             if(option.templateUrl) {
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.onreadystatechange = function () {
@@ -23,6 +23,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
             '</div>' +
             '<div class="titleBar">' +
+                '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
             '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
             '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +
