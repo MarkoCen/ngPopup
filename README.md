@@ -3,7 +3,8 @@
 
 ngPopup is a jQuery-independent modal / modeless dialog, it has only dependency on AngularJS, it has super easy-to-use options and methods, with fully customized theme.
 
-[Demo]
+[Demo]  
+[API]
 ##Install
 
 First [download] ```ngPopup.js``` ```ngPopupStyle.css```, or install througth [Bower]
@@ -49,12 +50,9 @@ $scope.ngPopupConfig = {
 ```javascript
 $scope.myNgPopup.open();
 ```
-##API
 
-####Options
-####Methods
-####Events
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
 [Bower]:http://bower.io/
 [AngularJS]:https://angularjs.org/
 [Demo]:http://markocen.com/ngPopupDemo.html
+[API]:https://github.com/MarkoCen/ngPopup/wiki/ngPopup
