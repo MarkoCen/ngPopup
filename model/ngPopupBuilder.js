@@ -50,9 +50,15 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                         $element.style.left = newPosition.left + "px";
                     }
                     $element.style.display = 'block';
+                    if(options.onOpen){
+                        options.onOpen();
+                    }
                 },
                 close: function(){
                     $element.style.display = 'none';
+                    if(options.onClose){
+                        options.onClose();
+                    }
                 },
                 maximize: function(){
                     $element.getElementsByClassName('content')[0].style.display = 'block';

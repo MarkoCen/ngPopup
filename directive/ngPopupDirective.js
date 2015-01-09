@@ -16,6 +16,9 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 $element.style.height = $option.height + 'px';
                 $element.style.top = $option.position.top + 'px';
                 $element.style.left = $option.position.left + 'px';
+                if($option.onResize){
+                    $option.onResize();
+                }
             },true)
 
             var modelName = $parse($option.modelName);
@@ -23,6 +26,9 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
+
+            var dragStartFlag = false;
+            var resizeStartFlag = false;
             element.append(compiledHtml);
 
             element.bind("mousedown", function(event){
@@ -37,7 +43,10 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                 if(target.hasClass('titleBar')) {
                     if($option.draggable == false) return;
-
+                    if($option.onDragStart){
+                        $option.onDragStart();
+                        dragStartFlag = true;
+                    }
                     $document.find('body').addClass('unselectable');
                     $document.bind("mousemove", function (event) {
 
@@ -53,6 +62,10 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                         $document.find('body').removeClass('unselectable');
 
                         return;
+                    }
+                    if($option.onResize){
+                        $option.onResize();
+                        resizeStartFlag = true;
                     }
 
                     $document.find('body').addClass('unselectable');
@@ -101,7 +114,10 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                 if(target.parent().hasClass('resizeBar')){
                     if($option.resizable == false)  { $document.find('body').removeClass('unselectable'); return;}
-
+                    if($option.onResize){
+                        $option.onResize();
+                        resizeStartFlag = true;
+                    }
                     $document.find('body').addClass('unselectable');
                     if(target.hasClass('left-bar')){
                         $document.bind("mousemove", function (event) {
@@ -142,6 +158,13 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
             });
 
             element.bind("mouseup", function(event){
+                if($option.onDragEnd && dragStartFlag){
+                    $option.onDragEnd();
+                    dragStartFlag = false;
+                    resizeStartFlag = false;
+                }
+
+
                 $document.find('body').removeClass('unselectable');
                 $document.unbind("mousemove");
             })
