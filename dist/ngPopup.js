@@ -4,31 +4,42 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
         restrict: "EA",
         scope:true,
         replace:true,
-        template:'<div class="ngPopup"></div>',
+        template:'<div class="ngPopup" ng-show="_option.isShow"></div>',
         link: function(scope, element, attrs){
 
             var $element = element[0];
-            $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
-
-            scope.$watch(attrs.option,function(newValue, oldValue){
-                $element.style.position = 'absolute';
-                $element.style.width = $option.width + 'px';
-                $element.style.height = $option.height + 'px';
-                $element.style.top = $option.position.top + 'px';
-                $element.style.left = $option.position.left + 'px';
-                if($option.onResize && (newValue.width != oldValue && newValue.height != oldValue.height)){
-                    $option.onResize();
-                }
-            },true);
-
+            var $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
             var modelName = $parse($option.modelName);
-            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
-
+            var dragStartFlag = false;
+            var resizeStartFlag = false;
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
 
-            var dragStartFlag = false;
-            var resizeStartFlag = false;
+            scope._option = $option;
+            scope.$watch(attrs.option,function(newValue, oldValue){
+                $element.style.position = 'absolute';
+                $element.style.width = newValue.width + 'px';
+                $element.style.height = newValue.height + 'px';
+                $element.style.top = newValue.position.top + 'px';
+                $element.style.left = newValue.position.left + 'px';
+                $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                if(newValue.isShow != oldValue.isShow){
+                    if(newValue.isShow){
+                        newValue.onOpen();
+                    }
+                    else{
+                        newValue.onClose();
+                    }
+                }
+                if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
+                    if(newValue.onResize){
+                        newValue.onResize();
+                    }
+                }
+            },true);
+
+            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
+
             element.append(compiledHtml);
 
             element.bind("mousedown", function(event){
@@ -165,6 +176,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 }
 
 
+
                 $document.find('body').removeClass('unselectable');
                 $document.unbind("mousemove");
             })
@@ -184,7 +196,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             var templateHtml = (option.template) ? option.template : '';
             var templateUrlHtml = '';
             var html = null;
-            console.log(option)
             if(option.templateUrl) {
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.onreadystatechange = function () {
@@ -221,24 +232,27 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
 
         },
-        getDefaultMethods: function(options,element,scope){
+        getDefaultMethods: function(options,element){
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
+                    console.log(options)
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
                     }
-                    $element.style.display = 'block';
                     if(options.onOpen){
                         options.onOpen();
                     }
+                    options.isShow = true;
+
                 },
                 close: function(){
-                    $element.style.display = 'none';
                     if(options.onClose){
                         options.onClose();
                     }
+                    options.isShow = false;
+
                 },
                 maximize: function(){
                     $element.getElementsByClassName('content')[0].style.display = 'block';
@@ -308,12 +322,13 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 title : "",
                 modal : false,
                 pinned : false,
+                isShow : true,
+                effect : 'fade',
                 onOpen : function(){},
                 onClose  : function(){},
                 onDragStart : function(){},
                 onDragEnd : function(){},
                 onResize : function(){}
-
             };
 
             return defaultOption;

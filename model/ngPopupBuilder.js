@@ -4,7 +4,6 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             var templateHtml = (option.template) ? option.template : '';
             var templateUrlHtml = '';
             var html = null;
-            console.log(option)
             if(option.templateUrl) {
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.onreadystatechange = function () {
@@ -41,24 +40,27 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
 
 
         },
-        getDefaultMethods: function(options,element,scope){
+        getDefaultMethods: function(options,element){
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
+                    console.log(options)
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
                     }
-                    $element.style.display = 'block';
                     if(options.onOpen){
                         options.onOpen();
                     }
+                    options.isShow = true;
+
                 },
                 close: function(){
-                    $element.style.display = 'none';
                     if(options.onClose){
                         options.onClose();
                     }
+                    options.isShow = false;
+
                 },
                 maximize: function(){
                     $element.getElementsByClassName('content')[0].style.display = 'block';
@@ -128,12 +130,13 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 title : "",
                 modal : false,
                 pinned : false,
+                isShow : true,
+                effect : 'fade',
                 onOpen : function(){},
                 onClose  : function(){},
                 onDragStart : function(){},
                 onDragEnd : function(){},
                 onResize : function(){}
-
             };
 
             return defaultOption;

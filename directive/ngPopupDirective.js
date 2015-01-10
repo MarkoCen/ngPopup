@@ -4,31 +4,42 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
         restrict: "EA",
         scope:true,
         replace:true,
-        template:'<div class="ngPopup"></div>',
+        template:'<div class="ngPopup" ng-show="_option.isShow"></div>',
         link: function(scope, element, attrs){
 
             var $element = element[0];
-            $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
-
-            scope.$watch(attrs.option,function(newValue, oldValue){
-                $element.style.position = 'absolute';
-                $element.style.width = $option.width + 'px';
-                $element.style.height = $option.height + 'px';
-                $element.style.top = $option.position.top + 'px';
-                $element.style.left = $option.position.left + 'px';
-                if($option.onResize && (newValue.width != oldValue && newValue.height != oldValue.height)){
-                    $option.onResize();
-                }
-            },true);
-
+            var $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
             var modelName = $parse($option.modelName);
-            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
-
+            var dragStartFlag = false;
+            var resizeStartFlag = false;
             var html = ngPopupBuilder.layoutInit($option);
             var compiledHtml = $compile(html)(scope.$parent);
 
-            var dragStartFlag = false;
-            var resizeStartFlag = false;
+            scope._option = $option;
+            scope.$watch(attrs.option,function(newValue, oldValue){
+                $element.style.position = 'absolute';
+                $element.style.width = newValue.width + 'px';
+                $element.style.height = newValue.height + 'px';
+                $element.style.top = newValue.position.top + 'px';
+                $element.style.left = newValue.position.left + 'px';
+                $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                if(newValue.isShow != oldValue.isShow){
+                    if(newValue.isShow){
+                        newValue.onOpen();
+                    }
+                    else{
+                        newValue.onClose();
+                    }
+                }
+                if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
+                    if(newValue.onResize){
+                        newValue.onResize();
+                    }
+                }
+            },true);
+
+            modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
+
             element.append(compiledHtml);
 
             element.bind("mousedown", function(event){
@@ -163,6 +174,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                     dragStartFlag = false;
                     resizeStartFlag = false;
                 }
+
 
 
                 $document.find('body').removeClass('unselectable');
