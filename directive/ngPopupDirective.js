@@ -18,8 +18,10 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
                 $element.style.position = 'absolute';
-                $element.style.width = newValue.width + 'px';
-                $element.style.height = newValue.height + 'px';
+                if(!scope.$parent.$eval($option.modelName).isMinimized()){
+                    $element.style.width = newValue.width + 'px';
+                    $element.style.height = newValue.height + 'px';
+                }
                 $element.style.top = newValue.position.top + 'px';
                 $element.style.left = newValue.position.left + 'px';
                 $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
@@ -63,7 +65,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                         $element.style.top = event.pageY - origY + targetTop + "px";
                         $element.style.left = event.pageX - origX + targetLeft + "px";
-                        ngPopupBuilder.updateParentScopeOptions($option,$element);
+                        ngPopupBuilder.updateParentScopeOptions($option,element);
                         ngPopupBuilder.callParentScopeApply(scope.$parent);
                     })
                 }
@@ -85,7 +87,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
                             $element.style.height = event.pageY - $element.offsetTop  + "px";
                             $element.style.width =  event.pageX - $element.offsetLeft + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -95,7 +97,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth + event.pageX - origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -106,7 +108,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -116,7 +118,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                             $element.style.left = event.pageX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -134,7 +136,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                         $document.bind("mousemove", function (event) {
                             $element.style.left = targetLeft + event.pageX - origX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -142,7 +144,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                         $document.bind("mousemove", function (event) {
 
                             $element.style.width = targetWidth + event.pageX - origX + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
 
                         })
@@ -151,14 +153,14 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                         $document.bind("mousemove", function (event) {
                             $element.style.top = event.pageY + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass('bottom-bar')){
                         $document.bind("mousemove", function (event) {
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }

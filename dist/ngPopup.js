@@ -18,8 +18,10 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
                 $element.style.position = 'absolute';
-                $element.style.width = newValue.width + 'px';
-                $element.style.height = newValue.height + 'px';
+                if(!scope.$parent.$eval($option.modelName).isMinimized()){
+                    $element.style.width = newValue.width + 'px';
+                    $element.style.height = newValue.height + 'px';
+                }
                 $element.style.top = newValue.position.top + 'px';
                 $element.style.left = newValue.position.left + 'px';
                 $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
@@ -63,7 +65,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
                         $element.style.top = event.pageY - origY + targetTop + "px";
                         $element.style.left = event.pageX - origX + targetLeft + "px";
-                        ngPopupBuilder.updateParentScopeOptions($option,$element);
+                        ngPopupBuilder.updateParentScopeOptions($option,element);
                         ngPopupBuilder.callParentScopeApply(scope.$parent);
                     })
                 }
@@ -85,7 +87,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
                             $element.style.height = event.pageY - $element.offsetTop  + "px";
                             $element.style.width =  event.pageX - $element.offsetLeft + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -95,7 +97,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth + event.pageX - origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -106,7 +108,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -116,7 +118,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                             $element.style.left = event.pageX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -134,7 +136,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                         $document.bind("mousemove", function (event) {
                             $element.style.left = targetLeft + event.pageX - origX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -142,7 +144,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                         $document.bind("mousemove", function (event) {
 
                             $element.style.width = targetWidth + event.pageX - origX + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
 
                         })
@@ -151,14 +153,14 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                         $document.bind("mousemove", function (event) {
                             $element.style.top = event.pageY + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass('bottom-bar')){
                         $document.bind("mousemove", function (event) {
                             $element.style.height = targetHeight + event.pageY - origY + "px";
-                            ngPopupBuilder.updateParentScopeOptions($option,$element);
+                            ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
@@ -216,8 +218,8 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             '<div class="titleBar">' +
                 '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
-            '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
-            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +
+            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+            '<span class="glyphicon glyphicon-fullscreen" ng-click=' + option.modelName + '.maximize()></span>' +
             '<span class="glyphicon glyphicon-resize-small" ng-click=' + option.modelName + '.togglePin($event)></span>' +
             '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
             '</div>' +
@@ -236,7 +238,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
-                    console.log(options)
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
@@ -260,33 +261,45 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     $element.style.left = window.screenLeft ? window.screenLeft : window.screenX +10 + "px";
                     $element.style.width = window.innerWidth - 30+ "px";
                     $element.style.height = window.innerHeight - 30 + "px";
-                    //this.updateParentScopeOptions(options,$element);
                     options.position.top =  $element.offsetTop;
                     options.position.left = $element.offsetLeft;
                     options.width = $element.offsetWidth;
                     options.height = $element.offsetHeight;
+
                 },
-                minimize: function(){
-                    $element.getElementsByClassName('content')[0].style.display = 'none';
-                    $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
-                    $element.style.width = '200px';
-                    options.position.top =  $element.offsetTop;
-                    options.position.left = $element.offsetLeft;
-                    options.width = $element.offsetWidth;
-                    options.height = $element.offsetHeight;
+                minimize: function(event){
+                    if($element.getElementsByClassName('content')[0].style.display != 'none'){
+                        $element.getElementsByClassName('content')[0].style.display = 'none';
+                        $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
+                        $element.style.width = '200px';
+                        angular.element(event.target).removeClass('glyphicon-minus');
+                        angular.element(event.target).addClass('glyphicon-plus');
+                    }
+                    else{
+                        $element.style.height = options.height + 'px';
+                        $element.style.width = options.width + 'px';
+                        $element.style.top = options.position.top + 'px';
+                        $element.style.left = options.position.left + 'px';
+                        $element.getElementsByClassName('content')[0].style.display = 'block';
+                        angular.element(event.target).removeClass('glyphicon-plus');
+                        angular.element(event.target).addClass('glyphicon-minus');
+                        options.position.top =  $element.offsetTop;
+                        options.position.left = $element.offsetLeft;
+                    }
                 },
+
                 togglePin: function(event){
                     if($option.pinned != true){
                         $element.style.position = 'fixed';
                         angular.element(event.target).removeClass('glyphicon-resize-small');
                         angular.element(event.target).addClass('glyphicon-resize-full');
-                        $option.pinned = true;
+                        options.pinned = true;
                     }
                     else{
                         $element.style.position = 'absolute';
                         angular.element(event.target).removeClass('glyphicon-resize-full');
                         angular.element(event.target).addClass('glyphicon-resize-small');
-                        $option.pinned = false;
+                        options.pinned = false;
                     }
 
                 },
@@ -339,10 +352,13 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             }
         },
         updateParentScopeOptions: function(options,element){
-            options.position.top =  element.offsetTop;
-            options.position.left = element.offsetLeft;
-            options.width = element.offsetWidth;
-            options.height = element.offsetHeight;
+            var $element = element[0]
+            options.position.top =  $element.offsetTop;
+            options.position.left = $element.offsetLeft;
+            if($element.getElementsByClassName('content')[0].style.display != 'none'){
+                options.width = $element.offsetWidth;
+                options.height = $element.offsetHeight;
+            }
         }
     };
 

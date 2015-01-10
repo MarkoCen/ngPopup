@@ -24,8 +24,8 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             '<div class="titleBar">' +
                 '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
-            '<span class="glyphicon glyphicon-plus" ng-click=' + option.modelName + '.maximize()></span>' +
-            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize()></span>' +
+            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+            '<span class="glyphicon glyphicon-fullscreen" ng-click=' + option.modelName + '.maximize()></span>' +
             '<span class="glyphicon glyphicon-resize-small" ng-click=' + option.modelName + '.togglePin($event)></span>' +
             '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
             '</div>' +
@@ -44,7 +44,6 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             var $element = element[0];
             var fun = {
                 open: function(newPosition){
-                    console.log(options)
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
@@ -68,33 +67,45 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     $element.style.left = window.screenLeft ? window.screenLeft : window.screenX +10 + "px";
                     $element.style.width = window.innerWidth - 30+ "px";
                     $element.style.height = window.innerHeight - 30 + "px";
-                    //this.updateParentScopeOptions(options,$element);
                     options.position.top =  $element.offsetTop;
                     options.position.left = $element.offsetLeft;
                     options.width = $element.offsetWidth;
                     options.height = $element.offsetHeight;
+
                 },
-                minimize: function(){
-                    $element.getElementsByClassName('content')[0].style.display = 'none';
-                    $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
-                    $element.style.width = '200px';
-                    options.position.top =  $element.offsetTop;
-                    options.position.left = $element.offsetLeft;
-                    options.width = $element.offsetWidth;
-                    options.height = $element.offsetHeight;
+                minimize: function(event){
+                    if($element.getElementsByClassName('content')[0].style.display != 'none'){
+                        $element.getElementsByClassName('content')[0].style.display = 'none';
+                        $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
+                        $element.style.width = '200px';
+                        angular.element(event.target).removeClass('glyphicon-minus');
+                        angular.element(event.target).addClass('glyphicon-plus');
+                    }
+                    else{
+                        $element.style.height = options.height + 'px';
+                        $element.style.width = options.width + 'px';
+                        $element.style.top = options.position.top + 'px';
+                        $element.style.left = options.position.left + 'px';
+                        $element.getElementsByClassName('content')[0].style.display = 'block';
+                        angular.element(event.target).removeClass('glyphicon-plus');
+                        angular.element(event.target).addClass('glyphicon-minus');
+                        options.position.top =  $element.offsetTop;
+                        options.position.left = $element.offsetLeft;
+                    }
                 },
+
                 togglePin: function(event){
                     if($option.pinned != true){
                         $element.style.position = 'fixed';
                         angular.element(event.target).removeClass('glyphicon-resize-small');
                         angular.element(event.target).addClass('glyphicon-resize-full');
-                        $option.pinned = true;
+                        options.pinned = true;
                     }
                     else{
                         $element.style.position = 'absolute';
                         angular.element(event.target).removeClass('glyphicon-resize-full');
                         angular.element(event.target).addClass('glyphicon-resize-small');
-                        $option.pinned = false;
+                        options.pinned = false;
                     }
 
                 },
@@ -147,10 +158,13 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             }
         },
         updateParentScopeOptions: function(options,element){
-            options.position.top =  element.offsetTop;
-            options.position.left = element.offsetLeft;
-            options.width = element.offsetWidth;
-            options.height = element.offsetHeight;
+            var $element = element[0]
+            options.position.top =  $element.offsetTop;
+            options.position.left = $element.offsetLeft;
+            if($element.getElementsByClassName('content')[0].style.display != 'none'){
+                options.width = $element.offsetWidth;
+                options.height = $element.offsetHeight;
+            }
         }
     };
 
