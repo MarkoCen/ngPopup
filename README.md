@@ -62,7 +62,7 @@ in ngPopup, the following properties support angular two-way binding (visit Wiki
 * isShow
 * draggable
 * resizable  
-You can bind them to ngModel or set value in controller, see the two-way binding example in [Demo] page
+You can bind them to ngModel or set value in controller dynamically, see the two-way binding example in [Demo] page
 
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
 [Bower]:http://bower.io/
