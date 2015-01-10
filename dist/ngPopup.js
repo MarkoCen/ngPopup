@@ -54,7 +54,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 var origY = event.pageY;
                 var origX = event.pageX;
 
-                if(target.hasClass('titleBar')) {
+                if(target.hasClass('titleBar') || target.hasClass('title')) {
                     if($option.draggable == false) return;
                     if($option.onDragStart){
                         $option.onDragStart();
