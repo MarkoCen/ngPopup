@@ -47,10 +47,22 @@ $scope.ngPopupConfig = {
     }
 }
 ```
-3 Call dialog methods by ```$scope.modelName``` :
+You can also call dialog methods by ```$scope.modelName``` which modelName is the property defined in option :
 ```javascript
-$scope.myNgPopup.open();
-```
+$scope.myNgPopup.open(); $scope.myNgPopup.maximize();
+```  
+##Two-way Binding  
+
+
+in ngPopup, the following properties support angular two-way binding (visit Wiki page for full property list):  
+* position
+* width
+* height
+* title
+* isShow
+* draggable
+* resizable  
+You can bind them to ngModel or set value in controller, you can see the two-way binding example in [Demo] page
 
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
 [Bower]:http://bower.io/
