@@ -5,13 +5,23 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
     options: {
-      separator: ' ',
+      separator: ' '
     },
     dist: {
       src: ['app.js','directive/ngPopupDirective.js','model/ngPopupBuilder.js'],
       dest: 'dist/ngPopup.js'
-    },
+    }
 	},
+
+    concat: {
+      options: {
+        separator: ' '
+      },
+      dist: {
+        src: ['css/ngPopupStyle.css'],
+        dest: 'dist/ngPopupStyle.css'
+      }
+    },
 	
 	
   uglify: {

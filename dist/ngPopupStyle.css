@@ -143,6 +143,10 @@
     float: left;
     margin-left: 7px;
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width:30%;
 }
 
 .ngPopup .iconGroup > span:hover {
