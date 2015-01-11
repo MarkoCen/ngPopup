@@ -244,6 +244,8 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
+                        options.position.top = newPosition.top;
+                        options.position.left = newPosition.left;
                     }
                     if(options.onOpen){
                         options.onOpen();

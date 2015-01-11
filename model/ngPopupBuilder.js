@@ -46,6 +46,8 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
                         $element.style.left = newPosition.left + "px";
+                        options.position.top = newPosition.top;
+                        options.position.left = newPosition.left;
                     }
                     if(options.onOpen){
                         options.onOpen();
