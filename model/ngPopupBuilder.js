@@ -1,6 +1,6 @@
 ngPopup.factory("ngPopupBuilder", function($q, $http){
     var ngPopupBuilder = {
-        layoutInit: function(option){
+        layoutInit: function(option,optionName){
             var templateHtml = (option.template) ? option.template : '';
             var templateUrlHtml = '';
             var html = null;
@@ -21,7 +21,7 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             '<div class="resizeBar">' +
             '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
             '</div>' +
-            '<div class="titleBar">' +
+            '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
                 '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
             '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
@@ -30,12 +30,11 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
             '</div>' +
             '</div>' +
-            '<div class="content">' +
+            '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">' +
             templateHtml +
             templateUrlHtml +
             '</div>' +
             '</div>';
-
             return html;
 
 
@@ -165,6 +164,22 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 options.width = $element.offsetWidth;
                 options.height = $element.offsetHeight;
             }
+        },
+        updateElementSize: function(element, width, height){
+            var $element = element[0];
+            if(typeof(width) == 'string') $element.style.width = width;
+            if(typeof(width) == 'number') $element.style.width = width + 'px';
+
+            if(typeof(height) == 'string') $element.style.height = height;
+            if(typeof(height) == 'number') $element.style.height = height + 'px';
+        },
+        updateElementPosition: function(element, position){
+            var $element = element[0];
+            if(typeof(position.top) == 'string') $element.style.top = position.top;
+            if(typeof(position.top) == 'number') $element.style.top = position.top + 'px';
+
+            if(typeof(position.left) == 'string') $element.style.left = position.left;
+            if(typeof(position.left) == 'number') $element.style.left = position.left + 'px';
         }
     };
 

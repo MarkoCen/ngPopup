@@ -37,7 +37,7 @@
     z-index: 1;
 }
 
-.ngPopup  > .container >.content{
+.ngPopup  > .container .content{
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     width:100%;
@@ -45,6 +45,18 @@
     position: relative;
     top: -25px;
     padding-top: 25px;
+    float:left;
+    overflow: auto;
+}
+
+    .ngPopup  > .container .contentNoBar{
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    width:100%;
+    height: 100%;
+    position: relative;
+    top: 0px;
+    padding-top: 0px;
     float:left;
     overflow: auto;
 }

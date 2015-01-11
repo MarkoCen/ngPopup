@@ -7,22 +7,15 @@ module.exports = function(grunt) {
     options: {
       separator: ' '
     },
-    dist: {
+    basic:{
+      src: ['css/ngPopupStyle.css'],
+      dest: 'dist/ngPopupStyle.css'
+    },
+    extras: {
       src: ['app.js','directive/ngPopupDirective.js','model/ngPopupBuilder.js'],
       dest: 'dist/ngPopup.js'
     }
-	},
-
-    concat: {
-      options: {
-        separator: ' '
-      },
-      dist: {
-        src: ['css/ngPopupStyle.css'],
-        dest: 'dist/ngPopupStyle.css'
-      }
-    },
-	
+  },
 	
   uglify: {
     options: {

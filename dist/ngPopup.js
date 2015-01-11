@@ -12,15 +12,14 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             var modelName = $parse($option.modelName);
             var dragStartFlag = false;
             var resizeStartFlag = false;
-            var html = ngPopupBuilder.layoutInit($option);
+            var html = ngPopupBuilder.layoutInit($option,attrs.option);
             var compiledHtml = $compile(html)(scope.$parent);
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
                 $element.style.position = 'absolute';
                 if(!scope.$parent.$eval($option.modelName).isMinimized()){
-                    $element.style.width = newValue.width + 'px';
-                    $element.style.height = newValue.height + 'px';
+                    ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
                 }
                 $element.style.top = newValue.position.top + 'px';
                 $element.style.left = newValue.position.left + 'px';
@@ -38,6 +37,12 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                         newValue.onResize();
                     }
                 }
+                if(newValue.hasTitleBar != oldValue.hasTitleBar){
+                    var html = ngPopupBuilder.layoutInit($option,attrs.option);
+                    var compiledHtml = $compile(html)(scope.$parent);
+                    element.empty();
+                    element.append(compiledHtml);
+                }
             },true);
 
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
@@ -47,14 +52,17 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             element.bind("mousedown", function(event){
 
                 var target = angular.element(event.target);
-                var targetTop = $element.offsetTop;
-                var targetLeft = $element.offsetLeft;
-                var targetHeight = parseInt($element.style.height, 10);
-                var targetWidth = parseInt($element.style.width,10);
+                //var targetTop = $element.offsetTop;
+                //var targetLeft = $element.offsetLeft;
+                var targetTop = parseFloat(window.getComputedStyle($element,null)['top']);
+                var targetLeft = parseFloat(window.getComputedStyle($element,null)['left']);
+                var targetHeight = parseFloat(window.getComputedStyle($element,null)['height']);
+                var targetWidth = parseFloat(window.getComputedStyle($element,null)['width']);
                 var origY = event.pageY;
                 var origX = event.pageX;
 
-                if(target.hasClass('titleBar') || target.hasClass('title')) {
+                if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar')) {
+
                     if($option.draggable == false) return;
                     if($option.onDragStart){
                         $option.onDragStart();
@@ -84,16 +92,14 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     $document.find('body').addClass('unselectable');
                     if(target.hasClass("right-bottom-corner")){
                         $document.bind("mousemove", function (event) {
-
-                            $element.style.height = event.pageY - $element.offsetTop  + "px";
-                            $element.style.width =  event.pageX - $element.offsetLeft + "px";
+                            $element.style.height = event.pageY - targetTop  + "px";
+                            $element.style.width =  event.pageX - targetLeft + "px";
                             ngPopupBuilder.updateParentScopeOptions($option,element);
                             ngPopupBuilder.callParentScopeApply(scope.$parent);
                         })
                     }
                     else if(target.hasClass("right-top-corner")){
                         $document.bind("mousemove", function (event) {
-
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth + event.pageX - origX + "px";
                             $element.style.height = targetHeight - event.pageY + origY + "px";
@@ -103,7 +109,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     }
                     else if(target.hasClass("left-top-corner")){
                         $document.bind("mousemove", function (event) {
-
                             $element.style.left = event.pageX + "px";
                             $element.style.top = event.pageY + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
@@ -114,7 +119,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     }
                     else if(target.hasClass("left-bottom-corner")){
                         $document.bind("mousemove", function (event) {
-
                             $element.style.left = event.pageX + "px";
                             $element.style.width = targetWidth - event.pageX + origX + "px";
                             $element.style.height = targetHeight + event.pageY - origY + "px";
@@ -194,7 +198,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
     }
 }); ngPopup.factory("ngPopupBuilder", function($q, $http){
     var ngPopupBuilder = {
-        layoutInit: function(option){
+        layoutInit: function(option,optionName){
             var templateHtml = (option.template) ? option.template : '';
             var templateUrlHtml = '';
             var html = null;
@@ -215,7 +219,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             '<div class="resizeBar">' +
             '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
             '</div>' +
-            '<div class="titleBar">' +
+            '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
                 '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
             '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
@@ -224,12 +228,11 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
             '</div>' +
             '</div>' +
-            '<div class="content">' +
+            '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">' +
             templateHtml +
             templateUrlHtml +
             '</div>' +
             '</div>';
-
             return html;
 
 
@@ -359,6 +362,22 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 options.width = $element.offsetWidth;
                 options.height = $element.offsetHeight;
             }
+        },
+        updateElementSize: function(element, width, height){
+            var $element = element[0];
+            if(typeof(width) == 'string') $element.style.width = width;
+            if(typeof(width) == 'number') $element.style.width = width + 'px';
+
+            if(typeof(height) == 'string') $element.style.height = height;
+            if(typeof(height) == 'number') $element.style.height = height + 'px';
+        },
+        updateElementPosition: function(element, position){
+            var $element = element[0];
+            if(typeof(position.top) == 'string') $element.style.top = position.top;
+            if(typeof(position.top) == 'number') $element.style.top = position.top + 'px';
+
+            if(typeof(position.left) == 'string') $element.style.left = position.left;
+            if(typeof(position.left) == 'number') $element.style.left = position.left + 'px';
         }
     };
 
