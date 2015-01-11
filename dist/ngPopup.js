@@ -365,10 +365,22 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
         },
         updateElementSize: function(element, width, height){
             var $element = element[0];
-            if(typeof(width) == 'string') $element.style.width = width;
+            if(typeof(width) == 'string'){
+                if(width.slice(-1) == "%"){
+                    $element.style.width = width;
+                }else{
+                    $element.style.width = parseInt(width, 10) + "px";
+                }
+            }
             if(typeof(width) == 'number') $element.style.width = width + 'px';
 
-            if(typeof(height) == 'string') $element.style.height = height;
+            if(typeof(height) == 'string'){
+                if(height.slice(-1) == "%"){
+                    $element.style.height = height;
+                }else{
+                    $element.style.height = parseInt(height, 10) + "px";
+                }
+            }
             if(typeof(height) == 'number') $element.style.height = height + 'px';
         },
         updateElementPosition: function(element, position){
