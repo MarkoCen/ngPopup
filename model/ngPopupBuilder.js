@@ -1,4 +1,8 @@
 ngPopup.factory("ngPopupBuilder", function($q, $http){
+    var isMax = false;
+    var isMin = false;
+    var tempHeight = 0;
+    var tempWidth = 0;
     var ngPopupBuilder = {
         layoutInit: function(option,optionName){
             var templateHtml = (option.template) ? option.template : '';
@@ -25,9 +29,9 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 '<span class="title">'+option.title+'</span>' +
             '<div class="iconGroup">' +
             '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
-            '<span class="glyphicon glyphicon-fullscreen" ng-click=' + option.modelName + '.maximize()></span>' +
-            '<span class="glyphicon glyphicon-resize-small" ng-click=' + option.modelName + '.togglePin($event)></span>' +
-            '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close()></span>' +
+            '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
+            '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+            '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
             '</div>' +
             '</div>' +
             '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">' +
@@ -35,6 +39,9 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
             templateUrlHtml +
             '</div>' +
             '</div>';
+
+            var tempHeight = option.height;
+            var tempWidth = option.width;
             return html;
 
 
@@ -55,23 +62,38 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                     options.isShow = true;
 
                 },
-                close: function(){
+                close: function($event){
                     if(options.onClose){
                         options.onClose();
                     }
                     options.isShow = false;
 
                 },
-                maximize: function(){
-                    $element.getElementsByClassName('content')[0].style.display = 'block';
-                    $element.style.top = window.screenTop ? window.screenTop : window.screenY +10 + "px";
-                    $element.style.left = window.screenLeft ? window.screenLeft : window.screenX +10 + "px";
-                    $element.style.width = window.innerWidth - 30+ "px";
-                    $element.style.height = window.innerHeight - 30 + "px";
-                    options.position.top =  $element.offsetTop;
-                    options.position.left = $element.offsetLeft;
-                    options.width = $element.offsetWidth;
-                    options.height = $element.offsetHeight;
+                maximize: function(event){
+                    if(!isMax) {
+                        tempHeight = $element.offsetHeight;
+                        tempWidth  = $element.offsetWidth;
+                        $element.getElementsByClassName('content')[0].style.display = 'block';
+                        $element.style.top = window.screenTop ? window.screenTop : window.screenY + 10 + "px";
+                        $element.style.left = window.screenLeft ? window.screenLeft : window.screenX + 10 + "px";
+                        $element.style.width = window.innerWidth - 30 + "px";
+                        $element.style.height = window.innerHeight - 30 + "px";
+                        options.position.top = $element.offsetTop;
+                        options.position.left = $element.offsetLeft;
+                        options.width = $element.offsetWidth;
+                        options.height = $element.offsetHeight;
+                        isMax = true;
+                        angular.element(event.target).removeClass('glyphicon-resize-full').addClass('glyphicon-resize-small');
+                    }
+                    else{
+                        $element.style.height = tempHeight + "px";
+                        $element.style.width = tempWidth + "px";
+                        options.width = $element.offsetWidth;
+                        options.height = $element.offsetHeight;
+                        isMax = false;
+                        angular.element(event.target).removeClass('glyphicon-resize-small').addClass('glyphicon-resize-full');
+                    }
+
 
                 },
                 minimize: function(event){
@@ -79,8 +101,8 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                         $element.getElementsByClassName('content')[0].style.display = 'none';
                         $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
                         $element.style.width = '200px';
-                        angular.element(event.target).removeClass('glyphicon-minus');
-                        angular.element(event.target).addClass('glyphicon-plus');
+                        angular.element(event.target).removeClass('glyphicon-minus').addClass('glyphicon-plus');
+                        isMin = true;
                     }
                     else{
                         $element.style.height = options.height + 'px';
@@ -88,24 +110,22 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                         $element.style.top = options.position.top + 'px';
                         $element.style.left = options.position.left + 'px';
                         $element.getElementsByClassName('content')[0].style.display = 'block';
-                        angular.element(event.target).removeClass('glyphicon-plus');
-                        angular.element(event.target).addClass('glyphicon-minus');
+                        angular.element(event.target).removeClass('glyphicon-plus').addClass('glyphicon-minus');
                         options.position.top =  $element.offsetTop;
                         options.position.left = $element.offsetLeft;
+                        isMin = false;
                     }
                 },
 
                 togglePin: function(event){
-                    if($option.pinned != true){
+                    if(options.pinned != true){
                         $element.style.position = 'fixed';
-                        angular.element(event.target).removeClass('glyphicon-resize-small');
-                        angular.element(event.target).addClass('glyphicon-resize-full');
+                        event.target.style.color = '#EB5342';
                         options.pinned = true;
                     }
                     else{
                         $element.style.position = 'absolute';
-                        angular.element(event.target).removeClass('glyphicon-resize-full');
-                        angular.element(event.target).addClass('glyphicon-resize-small');
+                        event.target.style.color = '';
                         options.pinned = false;
                     }
 
@@ -113,14 +133,11 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 setTitle: function(newTitle){
                     $element.getElementsByClassName('title')[0].innerHTML = newTitle;
                 },
-                isOpened: function(){
-                    return ($element.style.display != 'none') ? true : false;
-                },
                 isMaximized: function(){
-
+                    return isMax;
                 },
                 isMinimized: function(){
-                    return ($element.getElementsByClassName('content')[0].style.display != 'none') ? false : true;
+                    return isMin;
                 }
             };
 
