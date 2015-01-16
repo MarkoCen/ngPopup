@@ -143,7 +143,6 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
                 modal : false,
                 pinned : false,
                 isShow : true,
-                effect : 'fade',
                 onOpen : function(){},
                 onClose  : function(){},
                 onDragStart : function(){},

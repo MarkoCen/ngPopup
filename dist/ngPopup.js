@@ -52,8 +52,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
             element.bind("mousedown", function(event){
 
                 var target = angular.element(event.target);
-                //var targetTop = $element.offsetTop;
-                //var targetLeft = $element.offsetLeft;
                 var targetTop = parseFloat(window.getComputedStyle($element,null)['top']);
                 var targetLeft = parseFloat(window.getComputedStyle($element,null)['left']);
                 var targetHeight = parseFloat(window.getComputedStyle($element,null)['height']);
@@ -170,8 +168,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     }
                 }
 
-
-
             });
 
             element.bind("mouseup", function(event){
@@ -181,17 +177,9 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                     resizeStartFlag = false;
                 }
 
-
-
                 $document.find('body').removeClass('unselectable');
                 $document.unbind("mousemove");
             })
-
-
-
-
-
-
 
         }
 
@@ -341,7 +329,6 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 modal : false,
                 pinned : false,
                 isShow : true,
-                effect : 'fade',
                 onOpen : function(){},
                 onClose  : function(){},
                 onDragStart : function(){},
