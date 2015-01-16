@@ -17,7 +17,12 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
-                $element.style.position = 'absolute';
+                if(newValue.pinned){
+                    $element.style.position = 'fixed';
+                }
+                else{
+                    $element.style.position = 'absolute';
+                }
                 if(!scope.$parent.$eval($option.modelName).isMinimized()){
                     ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
                 }

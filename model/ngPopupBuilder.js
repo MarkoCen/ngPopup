@@ -1,4 +1,4 @@
-ngPopup.factory("ngPopupBuilder", function($q, $http){
+ngPopup.factory("ngPopupBuilder", function($q, $http, $document){
     var isMax = false;
     var isMin = false;
     var tempHeight = 0;
@@ -119,16 +119,14 @@ ngPopup.factory("ngPopupBuilder", function($q, $http){
 
                 togglePin: function(event){
                     if(options.pinned != true){
-                        $element.style.position = 'fixed';
                         event.target.style.color = '#EB5342';
                         options.pinned = true;
                     }
                     else{
-                        $element.style.position = 'absolute';
+                        console.log($document[0].body.scrollTop);
                         event.target.style.color = '';
                         options.pinned = false;
                     }
-
                 },
                 setTitle: function(newTitle){
                     $element.getElementsByClassName('title')[0].innerHTML = newTitle;

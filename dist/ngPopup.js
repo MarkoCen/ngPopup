@@ -17,7 +17,12 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
-                $element.style.position = 'absolute';
+                if(newValue.pinned){
+                    $element.style.position = 'fixed';
+                }
+                else{
+                    $element.style.position = 'absolute';
+                }
                 if(!scope.$parent.$eval($option.modelName).isMinimized()){
                     ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
                 }
@@ -184,7 +189,7 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
         }
 
     }
-}); ngPopup.factory("ngPopupBuilder", function($q, $http){
+}); ngPopup.factory("ngPopupBuilder", function($q, $http, $document){
     var isMax = false;
     var isMin = false;
     var tempHeight = 0;
@@ -305,16 +310,14 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
                 togglePin: function(event){
                     if(options.pinned != true){
-                        $element.style.position = 'fixed';
                         event.target.style.color = '#EB5342';
                         options.pinned = true;
                     }
                     else{
-                        $element.style.position = 'absolute';
+                        console.log($document[0].body.scrollTop);
                         event.target.style.color = '';
                         options.pinned = false;
                     }
-
                 },
                 setTitle: function(newTitle){
                     $element.getElementsByClassName('title')[0].innerHTML = newTitle;
