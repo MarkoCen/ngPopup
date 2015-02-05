@@ -1,13 +1,29 @@
-ngPopup.factory("ngPopupBuilder", function($q, $http, $document){
-    var isMax = false;
-    var isMin = false;
-    var tempHeight = 0;
-    var tempWidth = 0;
-    var ngPopupBuilder = {
+ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log){
+    var isMax = false
+        ,isMin = false
+        ,tempHeight = 0
+        ,tempWidth = 0
+        ,ngPopupBuilder = {
         layoutInit: function(option,optionName){
-            var templateHtml = (option.template) ? option.template : '';
-            var templateUrlHtml = '';
-            var html = null;
+            var templateHtml = (option.template) ? option.template : ''
+                ,templateUrlHtml = ''
+                ,html = '<div class="container">' +
+                '<div class="resizeCorner">' +
+                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '</div>' +
+                '<div class="resizeBar">' +
+                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '</div>' +
+                '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
+                '<span class="title">'+option.title+'</span>' +
+                '<div class="iconGroup">' +
+                '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+                '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
+                '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+                '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">'
             if(option.templateUrl) {
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.onreadystatechange = function () {
@@ -18,32 +34,45 @@ ngPopup.factory("ngPopupBuilder", function($q, $http, $document){
                 xmlHttpRequest.open("GET", option.templateUrl, false);
                 xmlHttpRequest.send(null);
             }
-            html = '<div class="container">' +
-            '<div class="resizeCorner">' +
-            '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
-            '</div>' +
-            '<div class="resizeBar">' +
-            '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
-            '</div>' +
-            '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
-                '<span class="title">'+option.title+'</span>' +
-            '<div class="iconGroup">' +
-            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
-            '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
-            '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
-            '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
-            '</div>' +
-            '</div>' +
-            '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">' +
-            templateHtml +
-            templateUrlHtml +
-            '</div>' +
-            '</div>';
-
-            var tempHeight = option.height;
-            var tempWidth = option.width;
+            html +=templateHtml + templateUrlHtml + '</div>' + '</div>';
             return html;
+        },
+        layoutInitAsync: function(option,optionName){
+            var templateHtml = (option.template) ? option.template : ''
+                ,deferred = $q.defer()
+                ,html = '<div class="container">' +
+                '<div class="resizeCorner">' +
+                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '</div>' +
+                '<div class="resizeBar">' +
+                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '</div>' +
+                '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
+                '<span class="title">'+option.title+'</span>' +
+                '<div class="iconGroup">' +
+                '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+                '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
+                '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+                '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">'
+            if(option.templateUrl) {
+                $http.get(option.templateUrl).then(function(templateUrlHtml){
+                        html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
+                        deferred.resolve(html);
+                },
+                function(reason){
+                    $log.log(reason);
+                    deferred.reject(reason);
+                });
 
+            }
+            else{
+                html += templateHtml + '</div>' + '</div>';
+                deferred.resolve(html);
+            }
+            return deferred.promise;
 
         },
         getDefaultMethods: function(options,element){

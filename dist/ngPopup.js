@@ -7,13 +7,17 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
         template:'<div class="ngPopup" ng-show="_option.isShow"></div>',
         link: function(scope, element, attrs){
 
-            var $element = element[0];
-            var $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
-            var modelName = $parse($option.modelName);
-            var dragStartFlag = false;
-            var resizeStartFlag = false;
-            var html = ngPopupBuilder.layoutInit($option,attrs.option);
-            var compiledHtml = $compile(html)(scope.$parent);
+            var $element = element[0]
+                ,$option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option)
+                ,modelName = $parse($option.modelName)
+                ,dragStartFlag = false
+                ,resizeStartFlag = false;
+
+
+            ngPopupBuilder.layoutInitAsync($option,attrs.option).then(function(html){
+                var compiledHtml = $compile(html)(scope.$parent);
+                element.append(compiledHtml);
+            });
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
@@ -28,7 +32,9 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 }
                 $element.style.top = newValue.position.top + 'px';
                 $element.style.left = newValue.position.left + 'px';
-                $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                if(newValue.title != oldValue.title){
+                    $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                }
                 if(newValue.isShow != oldValue.isShow){
                     if(newValue.isShow){
                         newValue.onOpen();
@@ -52,17 +58,15 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
 
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
 
-            element.append(compiledHtml);
-
             element.bind("mousedown", function(event){
 
-                var target = angular.element(event.target);
-                var targetTop = parseFloat(window.getComputedStyle($element,null)['top']);
-                var targetLeft = parseFloat(window.getComputedStyle($element,null)['left']);
-                var targetHeight = parseFloat(window.getComputedStyle($element,null)['height']);
-                var targetWidth = parseFloat(window.getComputedStyle($element,null)['width']);
-                var origY = event.pageY;
-                var origX = event.pageX;
+                var target = angular.element(event.target)
+                    ,targetTop = parseFloat(window.getComputedStyle($element,null)['top'])
+                    ,targetLeft = parseFloat(window.getComputedStyle($element,null)['left'])
+                    ,targetHeight = parseFloat(window.getComputedStyle($element,null)['height'])
+                    ,targetWidth = parseFloat(window.getComputedStyle($element,null)['width'])
+                    ,origY = event.pageY
+                    ,origX = event.pageX;
 
                 if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar')) {
 
@@ -189,16 +193,32 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
         }
 
     }
-}); ngPopup.factory("ngPopupBuilder", function($q, $http, $document){
-    var isMax = false;
-    var isMin = false;
-    var tempHeight = 0;
-    var tempWidth = 0;
-    var ngPopupBuilder = {
+}); ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log){
+    var isMax = false
+        ,isMin = false
+        ,tempHeight = 0
+        ,tempWidth = 0
+        ,ngPopupBuilder = {
         layoutInit: function(option,optionName){
-            var templateHtml = (option.template) ? option.template : '';
-            var templateUrlHtml = '';
-            var html = null;
+            var templateHtml = (option.template) ? option.template : ''
+                ,templateUrlHtml = ''
+                ,html = '<div class="container">' +
+                '<div class="resizeCorner">' +
+                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '</div>' +
+                '<div class="resizeBar">' +
+                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '</div>' +
+                '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
+                '<span class="title">'+option.title+'</span>' +
+                '<div class="iconGroup">' +
+                '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+                '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
+                '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+                '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">'
             if(option.templateUrl) {
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.onreadystatechange = function () {
@@ -209,32 +229,45 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 xmlHttpRequest.open("GET", option.templateUrl, false);
                 xmlHttpRequest.send(null);
             }
-            html = '<div class="container">' +
-            '<div class="resizeCorner">' +
-            '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
-            '</div>' +
-            '<div class="resizeBar">' +
-            '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
-            '</div>' +
-            '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
-                '<span class="title">'+option.title+'</span>' +
-            '<div class="iconGroup">' +
-            '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
-            '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
-            '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
-            '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
-            '</div>' +
-            '</div>' +
-            '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">' +
-            templateHtml +
-            templateUrlHtml +
-            '</div>' +
-            '</div>';
-
-            var tempHeight = option.height;
-            var tempWidth = option.width;
+            html +=templateHtml + templateUrlHtml + '</div>' + '</div>';
             return html;
+        },
+        layoutInitAsync: function(option,optionName){
+            var templateHtml = (option.template) ? option.template : ''
+                ,deferred = $q.defer()
+                ,html = '<div class="container">' +
+                '<div class="resizeCorner">' +
+                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '</div>' +
+                '<div class="resizeBar">' +
+                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '</div>' +
+                '<div class="titleBar" ng-show="{{' + optionName + '.hasTitleBar || !' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}}">' +
+                '<span class="title">'+option.title+'</span>' +
+                '<div class="iconGroup">' +
+                '<span class="glyphicon glyphicon-minus" ng-click=' + option.modelName + '.minimize($event)></span>' +
+                '<span class="glyphicon glyphicon-resize-full" ng-click=' + option.modelName + '.maximize($event)></span>' +
+                '<span class="glyphicon glyphicon-pushpin" ng-click=' + option.modelName + '.togglePin($event)></span>' +
+                '<span class="glyphicon glyphicon-remove" ng-click= ' + option.modelName + '.close($event)></span>' +
+                '</div>' +
+                '</div>' +
+                '<div class="content" ng-class="{'+'contentNoBar'+':{{!' + optionName+'.hasTitleBar &&' + optionName +'.hasOwnProperty(&quot;hasTitleBar&quot;)}} }">'
+            if(option.templateUrl) {
+                $http.get(option.templateUrl).then(function(templateUrlHtml){
+                        html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
+                        deferred.resolve(html);
+                },
+                function(reason){
+                    $log.log(reason);
+                    deferred.reject(reason);
+                });
 
+            }
+            else{
+                html += templateHtml + '</div>' + '</div>';
+                deferred.resolve(html);
+            }
+            return deferred.promise;
 
         },
         getDefaultMethods: function(options,element){

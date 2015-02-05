@@ -7,13 +7,17 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
         template:'<div class="ngPopup" ng-show="_option.isShow"></div>',
         link: function(scope, element, attrs){
 
-            var $element = element[0];
-            var $option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option);
-            var modelName = $parse($option.modelName);
-            var dragStartFlag = false;
-            var resizeStartFlag = false;
-            var html = ngPopupBuilder.layoutInit($option,attrs.option);
-            var compiledHtml = $compile(html)(scope.$parent);
+            var $element = element[0]
+                ,$option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option)
+                ,modelName = $parse($option.modelName)
+                ,dragStartFlag = false
+                ,resizeStartFlag = false;
+
+
+            ngPopupBuilder.layoutInitAsync($option,attrs.option).then(function(html){
+                var compiledHtml = $compile(html)(scope.$parent);
+                element.append(compiledHtml);
+            });
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
@@ -28,7 +32,9 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 }
                 $element.style.top = newValue.position.top + 'px';
                 $element.style.left = newValue.position.left + 'px';
-                $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                if(newValue.title != oldValue.title){
+                    $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+                }
                 if(newValue.isShow != oldValue.isShow){
                     if(newValue.isShow){
                         newValue.onOpen();
@@ -52,17 +58,15 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
 
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
 
-            element.append(compiledHtml);
-
             element.bind("mousedown", function(event){
 
-                var target = angular.element(event.target);
-                var targetTop = parseFloat(window.getComputedStyle($element,null)['top']);
-                var targetLeft = parseFloat(window.getComputedStyle($element,null)['left']);
-                var targetHeight = parseFloat(window.getComputedStyle($element,null)['height']);
-                var targetWidth = parseFloat(window.getComputedStyle($element,null)['width']);
-                var origY = event.pageY;
-                var origX = event.pageX;
+                var target = angular.element(event.target)
+                    ,targetTop = parseFloat(window.getComputedStyle($element,null)['top'])
+                    ,targetLeft = parseFloat(window.getComputedStyle($element,null)['left'])
+                    ,targetHeight = parseFloat(window.getComputedStyle($element,null)['height'])
+                    ,targetWidth = parseFloat(window.getComputedStyle($element,null)['width'])
+                    ,origY = event.pageY
+                    ,origX = event.pageX;
 
                 if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar')) {
 
