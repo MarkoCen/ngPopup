@@ -36,8 +36,8 @@ angular.module("yourApp",["ngPopup"]);
 ```javascript
 $scope.ngPopupConfig = {
 	modelName: "myNgPopup",
-    width: 500,
-    height:500,
+    width: $scope.inputWidth,
+    height:$scope.inputHeight,
     templateUrl:"../views/ngPopupContents.html",
     resizable:true,
     draggable:true,
