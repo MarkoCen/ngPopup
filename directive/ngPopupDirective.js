@@ -12,6 +12,7 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 ,modelName = $parse($option.modelName)
                 ,dragStartFlag = false
                 ,resizeStartFlag = false
+                ,initDone = false
                 ,linkParams = {
                     scope: scope,
                     element: element,
@@ -22,11 +23,12 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 var compiledHtml = $compile(html)(scope.$parent);
                 element.append(compiledHtml);
                 ngPopupBuilder.updateBindingValue($option,ngPopupBuilder.getDefaultOptions(), linkParams);
+                initDone = true;
             });
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
-                ngPopupBuilder.updateBindingValue(newValue,oldValue, linkParams);
+                if(initDone) ngPopupBuilder.updateBindingValue(newValue,oldValue, linkParams);
             },true);
 
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
