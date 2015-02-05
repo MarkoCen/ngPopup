@@ -1,4 +1,4 @@
-ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log){
+ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log, $compile){
     var isMax = false
         ,isMin = false
         ,tempHeight = 0
@@ -237,6 +237,48 @@ ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log){
 
             if(typeof(position.left) == 'string') $element.style.left = position.left;
             if(typeof(position.left) == 'number') $element.style.left = position.left + 'px';
+        },
+        updateBindingValue: function(newValue, oldValue, linkParams){
+            var scope = linkParams.scope
+                ,element = linkParams.element
+                ,attrs = linkParams.attrs
+                ,$element = element[0];
+            if(newValue.pinned){
+                $element.style.position = 'fixed';
+            }
+            else{
+                $element.style.position = 'absolute';
+            }
+            if(!scope.$parent.$eval(newValue.modelName).isMinimized()){
+                ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
+            }
+            if(newValue.position.top != oldValue.position.top || newValue.position.left != newValue.position.left){
+                $element.style.top = newValue.position.top + 'px';
+                $element.style.left = newValue.position.left + 'px';
+            }
+            if(newValue.title != oldValue.title){
+                $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
+            }
+            if(newValue.isShow != oldValue.isShow){
+                if(newValue.isShow){
+                    newValue.onOpen();
+                }
+                else{
+                    newValue.onClose();
+                }
+            }
+            if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
+                if(newValue.onResize){
+                    newValue.onResize();
+                }
+            }
+            if(newValue.hasTitleBar != oldValue.hasTitleBar){
+                this.layoutInitAsync(newValue,attrs.option).then(function(html){
+                    var compiledHtml = $compile(html)(scope.$parent);
+                    element.empty();
+                    element.append(compiledHtml);
+                });
+            }
         }
     };
 

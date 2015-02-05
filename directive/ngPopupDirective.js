@@ -11,51 +11,22 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
                 ,$option = (scope.$parent.$eval(attrs.option) == null) ? ngPopupBuilder.getDefaultOptions() : scope.$parent.$eval(attrs.option)
                 ,modelName = $parse($option.modelName)
                 ,dragStartFlag = false
-                ,resizeStartFlag = false;
-
+                ,resizeStartFlag = false
+                ,linkParams = {
+                    scope: scope,
+                    element: element,
+                    attrs: attrs
+                };
 
             ngPopupBuilder.layoutInitAsync($option,attrs.option).then(function(html){
                 var compiledHtml = $compile(html)(scope.$parent);
                 element.append(compiledHtml);
+                ngPopupBuilder.updateBindingValue($option,ngPopupBuilder.getDefaultOptions(), linkParams);
             });
 
             scope._option = $option;
             scope.$watch(attrs.option,function(newValue, oldValue){
-                if(newValue.pinned){
-                    $element.style.position = 'fixed';
-                }
-                else{
-                    $element.style.position = 'absolute';
-                }
-                if(!scope.$parent.$eval($option.modelName).isMinimized()){
-                    ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
-                }
-                if(newValue.position.top != oldValue.position.top || newValue.position.left != newValue.position.left){
-                    $element.style.top = newValue.position.top + 'px';
-                    $element.style.left = newValue.position.left + 'px';
-                }
-                if(newValue.title != oldValue.title){
-                    $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
-                }
-                if(newValue.isShow != oldValue.isShow){
-                    if(newValue.isShow){
-                        newValue.onOpen();
-                    }
-                    else{
-                        newValue.onClose();
-                    }
-                }
-                if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
-                    if(newValue.onResize){
-                        newValue.onResize();
-                    }
-                }
-                if(newValue.hasTitleBar != oldValue.hasTitleBar){
-                    var html = ngPopupBuilder.layoutInit($option,attrs.option);
-                    var compiledHtml = $compile(html)(scope.$parent);
-                    element.empty();
-                    element.append(compiledHtml);
-                }
+                ngPopupBuilder.updateBindingValue(newValue,oldValue, linkParams);
             },true);
 
             modelName.assign(scope.$parent, ngPopupBuilder.getDefaultMethods($option,element,scope.$parent));
