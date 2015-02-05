@@ -30,8 +30,10 @@ var ngPopup = angular.module("ngPopup",[ ]); ngPopup.directive("ngPopUp",functio
                 if(!scope.$parent.$eval($option.modelName).isMinimized()){
                     ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
                 }
-                $element.style.top = newValue.position.top + 'px';
-                $element.style.left = newValue.position.left + 'px';
+                if(newValue.position.top != oldValue.position.top || newValue.position.left != newValue.position.left){
+                    $element.style.top = newValue.position.top + 'px';
+                    $element.style.left = newValue.position.left + 'px';
+                }
                 if(newValue.title != oldValue.title){
                     $element.getElementsByClassName('title')[0].innerHTML = newValue.title;
                 }
