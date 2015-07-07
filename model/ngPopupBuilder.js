@@ -1,4 +1,4 @@
-ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log, $compile){
+ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile', function($q, $http, $document,$log, $compile){
     var isMax = false
         ,isMin = false
         ,tempHeight = 0
@@ -283,4 +283,4 @@ ngPopup.factory("ngPopupBuilder", function($q, $http, $document,$log, $compile){
     };
 
     return ngPopupBuilder;
-});
+}]);
