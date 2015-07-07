@@ -1,4 +1,4 @@
-ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, ngPopupBuilder){
+ngPopup.directive("ngPopUp",['$parse', '$document', '$templateCache', '$compile', 'ngPopupBuilder', function($parse,$document,$templateCache, $compile, ngPopupBuilder){
 
     return{
         restrict: "EA",
@@ -168,4 +168,4 @@ ngPopup.directive("ngPopUp",function($parse,$document,$templateCache, $compile, 
         }
 
     }
-});
+}]);
