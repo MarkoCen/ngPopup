@@ -8,7 +8,7 @@ ngPopup is a jQuery-independent modal / modeless dialog, it has only dependency 
 [API]
 ##Install
 
-First [download] ```ngPopup.js``` ```ngPopupStyle.css```, or install througth [Bower]
+First [download] ```ngPopup.js``` ```ngPopup.css```, or install througth [Bower]
 ```
 bower install ng-popup
 ```
