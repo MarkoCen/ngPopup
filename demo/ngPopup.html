@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/paper/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../dist/ngPopup.min.css">
+    <script src="../dist/ngPopup.js"></script>
+
+</head>
+<body ng-app="demoApp" ng-controller="demoCtrl">
+
+    <header>
+        <h1 class="text-primary" style='font-family: monospace;'>&nbsp;<strong>ngPopup</strong> - lightweight modaless dialog for Angular.</h1>
+        <ul class="text-primary" style="font-size: large;">
+            <li>jQuery Independent</li>
+            <li>Latest Angular Supported (1.4.2)</li>
+            <li>Full Customized Theme</li>
+        </ul>
+    </header>
+
+    <div id="demo1" style="position: relative;height: 70vh;width:50%;float:left;background: whitesmoke;padding:2em;border-bottom: 1px solid lightgrey;">
+        <p class="text-primary" style="font-size: large;">Two-way Binding: </p>
+        <div class="input-group" style="width:20%;">
+            <span class="input-group-addon">Width</span>
+            <input type="number" class="form-control" ng-model="ngPopupOption.width">
+        </div>
+        <div class="input-group" style="width:20%;">
+            <span class="input-group-addon">Height</span>
+            <input type="number" class="form-control" ng-model="ngPopupOption.height">
+        </div>
+        <div class="input-group" style="width:20%;">
+            <span class="input-group-addon">Top</span>
+            <input type="number" class="form-control" ng-model="ngPopupOption.position.top">
+        </div>
+        <div class="input-group" style="width:20%;">
+            <span class="input-group-addon">Left</span>
+            <input type="number" class="form-control" ng-model="ngPopupOption.position.left">
+        </div>
+        <button class="btn btn-primary" ng-click="toggleView()" style="margin-top: 1em;">Toggle Visible</button><br>
+        <button class="btn btn-primary" ng-click="toggleTitleBar()"  style="margin-top: 1em;">Toggle Title Bar</button><br>
+        <button class="btn btn-primary" ng-click="toggleDrag()"  style="margin-top: 1em;">Toggle Draggable</button><br>
+        <button class="btn btn-primary" ng-click="toggleResize()"  style="margin-top: 1em;">Toggle Resizable</button>
+
+    </div>
+    <div id="demo2" style="position: relative;height: 70vh;width:50%;float:left;background: whitesmoke;padding:2em;border-bottom: 1px solid lightgrey;">
+        <p class="text-primary" style="font-size: large;">Events: </p>
+        <p class="text-primary" style="font-size: medium;">ngPopup supports <strong>Open</strong>, <strong>Close</strong>, <strong>Drag Start</strong>, <strong>Drag End</strong> and <strong>Resize</strong> events</p>
+        <ul style="height:80%;width:35%;overflow-y: auto;" class="text-primary">
+            <li ng-repeat="item in msgList track by $index">{{item}}</li>
+        </ul>
+    </div>
+    <div id="demo3" style="position: relative;height: 70vh;width:50%;float:left;background: whitesmoke;padding:2em;border-bottom: 1px solid lightgrey;">
+        <p class="text-primary" style="font-size: large;">Examples: Floating Video Player</p>
+
+    </div>
+    <div id="demo4" style="position: relative;height: 70vh;width:50%;float:left;background: whitesmoke;padding:2em;border-bottom: 1px solid lightgrey;">
+        <p class="text-primary" style="font-size: large;">Examples: Popover Window</p>
+        <div style="width:80%;height:70%;border:1px solid lightgrey;padding:2em;color:grey;" ng-click="popDialog($event)">Click This Area</div>
+    </div>
+    <ng-pop-up option="ngPopupOption"></ng-pop-up>
+    <ng-pop-up option="ngPopupOptionDemo2"></ng-pop-up>
+    <ng-pop-up option="ngPopupOptionDemo3"></ng-pop-up>
+    <ng-pop-up option="ngPopupOptionDemo4"></ng-pop-up>
+
+
+    <script>
+        var demoApp = angular.module('demoApp', ['ngPopup']);
+
+        demoApp.controller("demoCtrl", function ($scope) {
+            $scope.test = function (event) {
+                console.log(event)
+            }
+            $scope.toggleResize = function () {
+                $scope.ngPopupOption.resizable = !$scope.ngPopupOption.resizable;
+            }
+            $scope.toggleDrag = function () {
+                $scope.ngPopupOption.draggable = !$scope.ngPopupOption.draggable;
+            }
+            $scope.toggleTitleBar = function () {
+                $scope.ngPopupOption.hasTitleBar = !$scope.ngPopupOption.hasTitleBar;
+            };
+
+            $scope.toggleView = function () {
+                $scope.ngPopupOption.isShow = !$scope.ngPopupOption.isShow;
+            };
+
+            $scope.msgList = [];
+            $scope.insertEventMessage = function (msg) {
+                $scope.msgList.push(msg)
+            };
+
+            $scope.popDialog = function (event) {
+                $scope.ngPopupOptionDemo4.position.top = event.pageY;
+                $scope.ngPopupOptionDemo4.position.left = event.pageX;
+                $scope.ngPopupOptionDemo4.isShow = true;
+
+            }
+
+            $scope.ngPopupOption = {
+                modelName: "myNgPopup",
+                width: 400,
+                height: 300,
+                hasTitleBar:true,
+                template: '<img src="http://www.omgubuntu.co.uk/wp-content/uploads/2014/03/Forever-Shady-S.jpg" style="width:100%;height:100%;">',
+                title: "Awesome Dialog",
+                resizable:true,
+                draggable: true,
+                position: { top : 250, left : 300},
+                onOpen : function(){},
+                onClose  : function(){},
+                onDragStart : function(){},
+                onDragEnd : function(){},
+                onResize : function(){}
+            }
+
+            $scope.ngPopupOptionDemo2 = {
+                modelName: "myNgPopup",
+                width: 300,
+                height: 300,
+                hasTitleBar:true,
+                template: '<img src="https://hungfu.files.wordpress.com/2014/01/field.jpg?w=500" style="width:100%;height:100%;">',
+                title: "Awesome Dialog",
+                resizable:true,
+                draggable: true,
+                position: { top : 250, left : 1300},
+                onOpen : function(){$scope.insertEventMessage('Open Event Fired!')},
+                onClose  : function(){$scope.insertEventMessage('Close Event Fired!')},
+                onDragStart : function(){$scope.insertEventMessage('Drag Start Event Fired!')},
+                onDragEnd : function(){$scope.insertEventMessage('Drag End Event Fired!')},
+                onResize : function(){$scope.insertEventMessage('Resize Event Fired!')}
+            }
+
+            $scope.ngPopupOptionDemo3 = {
+                modelName: "myNgPopup",
+                width: 700,
+                height: 500,
+                hasTitleBar:true,
+                template: '<iframe style="height:100%;width:100%;" src="https://www.youtube.com/embed/QSGNFLv9qtw?controls=1&showinfo=0&autoplay=1" frameborder="0"></iframe>',
+                title: "Floating Video Player",
+                resizable:true,
+                draggable: true,
+                position: { top : 950, left : 100}
+
+            }
+
+            $scope.ngPopupOptionDemo4 = {
+                modelName: "myNgPopup",
+                width: 350,
+                height: 400,
+                hasTitleBar:false,
+                template: '<div class="thumbnail" style="height:91%;width:100%;"><img src="http://www.bacancytechnology.com/wp-content/uploads/2015/02/AngularJS-Flat-Icon-Vector.png"><div class="caption"><h4>ngPopup</h4><p>light weight Angular Dialog</p><p><a class="btn btn-primary" href="https://github.com/MarkoCen/ngPopup" role="button">Source</a> <a href="https://github.com/MarkoCen/ngPopup/wiki" class="btn btn-default" role="button">API</a></p></div></div>',
+                title: "Floating Video Player",
+                resizable:false,
+                draggable: true,
+                isShow:false,
+                position: { top : 950, left : 100}
+
+            }
+        })
+    </script>
+</body>
+</html>
