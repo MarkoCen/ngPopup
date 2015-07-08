@@ -1,29 +1,26 @@
 {
   "name": "ngPopup",
   "description": "A modeless dialog for AngularJS",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage": "https://github.com/MarkoCen/ngPopup",
-  "main": "dist/ngPopup.js",
+  "main": ["dist/ngPopup.js", "dist/ngPopup.css"],
   "license": "MIT",
   "private": false,
   "ignore":[
+    "css",
+    "demo",
     "directive",
-    "e2e-tests",
     "lib",
     "model",
     "views",
     ".bowerrc",
-    ".gitattributes",
     ".gitignore",
-    ".jshintignore",
-    ".jshintrc",
-    ".travis.yml",
     "app.js",
-    "karma.conf.js",
     "bower.json",
-    "gruntfile.js",
+    "gulpfile.js",
     "package.json",
-    "README.md"
+    "README.md",
+    "node_modules"
   ],
   "dependencies": {
     "angular": ">=1.2.x"
