@@ -15,7 +15,7 @@ bower install ng-popup
 Include it in your html page :
 
 ```html
-<link rel='stylesheet' href='ngPopupStyle.css'>
+<link rel='stylesheet' href='ngPopup.css'>
 <script src='ngPopup.js'></script>
 ```
 
