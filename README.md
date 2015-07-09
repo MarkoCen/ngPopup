@@ -1,7 +1,7 @@
 #ngPopup
 -----
 
-ngPopup is a jQuery-independent modal / modeless dialog, it has only dependency on AngularJS, it has super easy-to-use options and methods, with fully customized theme.
+ngPopup is a light-weight modeless dialog for Angular, it is jQuery-independent and has only dependency on AngularJS. It supports angular two-way binding on dialog properties(width, height, position...), and has full customized theme.
 
 [Demo]
 
@@ -16,7 +16,7 @@ Include it in your html page :
 
 ```html
 <link rel='stylesheet' href='ngPopup.css'>
-<script src='ngPopup.js'></script>
+<script type='text/javascript' src='ngPopup.js'></script>
 ```
 
 
@@ -51,12 +51,12 @@ $scope.ngPopupConfig = {
 ##Two-way Binding  
 
 
-in ngPopup, the following properties support angular two-way binding (visit Wiki page for full property list):  
+in ngPopup, the following properties support angular two-way binding (visit Wiki page for full properties list):  
 * position
 * width
 * height
 * title
-* isShow
+* show/hide
 * draggable
 * resizable  
 see the two-way binding example in [Demo] page
