@@ -146,7 +146,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 options.modelName = options.modelName || "ngPopup";
                 options.width = options.width || 100;
                 options.height = options.height || 100;
-                options.template = options.template || "<div>No content assigned, <br><a href='https://github.com/MarkoCen/ngPopup/wiki/API-:-Options'>ngPopup API Options</a></div>"
+                options.template = options.template || '';
                 options.templateUrl = options.templateUrl || null;
                 options.resizable = (options.resizable == null) ? true : options.resizable;
                 options.draggable = (options.draggable == null) ? true : options.draggable;
@@ -169,7 +169,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                     modelName : "myDialog",
                     width : 100,
                     height : 100,
-                    template: "<div>No content assigned, <br><a href='https://github.com/MarkoCen/ngPopup/wiki/API-:-Options'>ngPopup API Options</a></div>",
+                    template: "",
                     templateUrl : null,
                     resizable : true,
                     draggable : true,
