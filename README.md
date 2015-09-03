@@ -8,9 +8,12 @@ ngPopup is a light-weight modeless dialog for Angular, it is jQuery-independent 
 [API]
 ##Install
 
-First [download] ```ngPopup.js``` ```ngPopup.css```, or install througth [Bower]
+Install through Bower or NPM, 
 ```
-bower install ng-popup
+bower install ng-popup -S
+```
+```
+npm install ng-popup -S
 ```
 Include it in your html page :
 
@@ -65,7 +68,6 @@ see the two-way binding example in [Demo] page
 The MIT License
 
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
-[Bower]:http://bower.io/
 [AngularJS]:https://angularjs.org/
 [Demo]:http://markocen.github.io/ngPopup/ngPopupDemo.html
 [API]:https://github.com/MarkoCen/ngPopup/wiki/ngPopup
