@@ -1,8 +1,8 @@
 {
   "name": "ng-popup",
   "private": false,
-  "version": "0.1.2",
-  "description": "An Angular modal or modeless dialog without jQuery dependency",
+  "version": "0.4.0",
+  "description": "Angular modeless dialog without jQuery dependency",
   "repository": "https://github.com/MarkoCen/ngPopup.git",
   "license": "MIT",
   "devDependencies": {
