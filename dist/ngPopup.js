@@ -1,3 +1,10 @@
+/**
+ * ng-popup - Angular modeless dialog without jQuery dependency
+ * @author Marko Cen
+ * @version v0.4.1
+ * @link http://markocen.github.io/ngPopup/ngPopupDemo.html
+ * @license MIT
+ */
 var ngPopup = angular.module("ngPopup",[ ]);
 ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile', function($q, $http, $document,$log, $compile){
     var eventTrigger = false
@@ -18,10 +25,10 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 '<div class="titleBar" ng-show="option.hasTitleBar">' +
                 '<span class="title">{{option.title}}</span>' +
                 '<div class="iconGroup">' +
-                '<span class="glyphicon glyphicon-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></span>' +
-                '<span class="glyphicon glyphicon-resize-full" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></span>' +
-                '<span class="glyphicon glyphicon-pushpin" ng-click="action.togglePin($event)" id="pinBtn"></span>' +
-                '<span class="glyphicon glyphicon-remove" ng-click="action.close($event)" id="closeBtn"></span>' +
+                '<i class="fa fa-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></i>' +
+                '<i class="fa fa-expand" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></i>' +
+                '<i class="fa fa-map-pin" ng-click="action.togglePin($event)" id="pinBtn"></i>' +
+                '<i class="fa fa-close" ng-click="action.close($event)" id="closeBtn"></i>' +
                 '</div>' +
                 '</div>' +
                 '<div class="content" ng-class="{contentNoBar:!option.hasTitleBar}">';
@@ -80,14 +87,14 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         options.position.left = $element.offsetLeft;
                         options.width = $element.offsetWidth;
                         options.height = $element.offsetHeight;
-                        angular.element(document.querySelector("#maxBtn")).removeClass('glyphicon-resize-full').addClass('glyphicon-resize-small');
+                        angular.element(document.querySelector("#maxBtn")).removeClass('fa-expand').addClass('fa-compress');
                     }
                     else{
                         $element.style.height = tempHeight + "px";
                         $element.style.width = tempWidth + "px";
                         options.width = $element.offsetWidth;
                         options.height = $element.offsetHeight;
-                        angular.element(document.querySelector("#maxBtn")).removeClass('glyphicon-resize-small').addClass('glyphicon-resize-full');
+                        angular.element(document.querySelector("#maxBtn")).removeClass('fa-compress').addClass('fa-expand');
                     }
 
                     options.isMaximized = !options.isMaximized;
@@ -100,7 +107,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         $element.getElementsByClassName('content')[0].style.display = 'none';
                         $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
                         $element.style.width = '200px';
-                        angular.element(document.querySelector("#minBtn")).removeClass('glyphicon-minus').addClass('glyphicon-plus');
+                        angular.element(document.querySelector("#minBtn")).removeClass('fa-minus').addClass('fa-plus');
                     }
                     else{
                         $element.style.height = options.height + 'px';
@@ -108,7 +115,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         $element.style.top = options.position.top + 'px';
                         $element.style.left = options.position.left + 'px';
                         $element.getElementsByClassName('content')[0].style.display = 'block';
-                        angular.element(document.querySelector("#minBtn")).removeClass('glyphicon-plus').addClass('glyphicon-minus');
+                        angular.element(document.querySelector("#minBtn")).removeClass('fa-plus').addClass('fa-minus');
                         options.position.top =  $element.offsetTop;
                         options.position.left = $element.offsetLeft;
                     }
@@ -174,8 +181,8 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                     resizable : true,
                     draggable : true,
                     position : {
-                        top : 0,
-                        left : 0
+                        top : -1,
+                        left : -1
                     },
                     title : "Welcome to ngPopup!",
                     hasTitleBar : true,
@@ -189,11 +196,6 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 }
             }
 
-        },
-        callParentScopeApply: function(scope){
-            if(!scope.$$phase){
-                scope.$digest()
-            }
         },
         updateParentScopeOptions: function(options,element){
             var $element = element[0];
@@ -287,9 +289,9 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
 
 ngPopup.directive("ngPopUp",[
 
-    '$parse', '$document', '$templateCache', '$compile', 'ngPopupBuilder',
+    '$parse', '$document', '$timeout', '$templateCache', '$compile', 'ngPopupBuilder',
 
-    function($parse,$document,$templateCache, $compile, ngPopupBuilder){
+    function($parse,$document, $timeout, $templateCache, $compile, ngPopupBuilder){
 
         return{
             restrict: "EA",
@@ -328,140 +330,145 @@ ngPopup.directive("ngPopUp",[
                 element.bind("mousedown", function(event){
 
 
-                    var target = angular.element(event.target)
-                        ,targetTop = parseFloat(window.getComputedStyle($element,null)['top'])
-                        ,targetLeft = parseFloat(window.getComputedStyle($element,null)['left'])
-                        ,targetHeight = parseFloat(window.getComputedStyle($element,null)['height'])
-                        ,targetWidth = parseFloat(window.getComputedStyle($element,null)['width'])
-                        ,origY = event.pageY
-                        ,origX = event.pageX;
+                    $timeout(function () {
+                        var target = angular.element(event.target)
+                            ,targetTop = parseFloat(window.getComputedStyle($element,null)['top'])
+                            ,targetLeft = parseFloat(window.getComputedStyle($element,null)['left'])
+                            ,targetHeight = parseFloat(window.getComputedStyle($element,null)['height'])
+                            ,targetWidth = parseFloat(window.getComputedStyle($element,null)['width'])
+                            ,origY = event.pageY
+                            ,origX = event.pageX;
 
-                    if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar') || target.hasClass('contentNoBar')) {
+                        if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar') || target.hasClass('contentNoBar')) {
 
-                        if($option.draggable == false) return;
-                        if($option.onDragStart){
-                            $option.onDragStart();
-                            dragStartFlag = true;
-                        }
-                        $document.find('body').addClass('unselectable');
-                        $document.bind("mousemove", function (event) {
-
-                            $element.style.top = event.pageY - origY + targetTop + "px";
-                            $element.style.left = event.pageX - origX + targetLeft + "px";
-                            ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                            ngPopupBuilder.callParentScopeApply(scope.$parent);
-                        })
-
-                    }
-
-                    if(target.parent().hasClass('resizeCorner')){
-                        if($option.resizable == false) {
-                            $document.find('body').removeClass('unselectable');
-
-                            return;
-                        }
-                        if($option.onResize){
-                            $option.onResize();
-                            resizeStartFlag = true;
-                        }
-
-                        $document.find('body').addClass('unselectable');
-                        if(target.hasClass("right-bottom-corner")){
+                            if($option.draggable == false) return;
+                            if($option.onDragStart){
+                                $option.onDragStart();
+                                dragStartFlag = true;
+                            }
+                            $document.find('body').addClass('unselectable');
                             $document.bind("mousemove", function (event) {
-                                $element.style.height = targetHeight + event.pageY - origY + "px";
-                                $element.style.width = targetWidth + event.pageX - origX + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
+                                $timeout(function () {
+                                    $element.style.top = event.pageY - origY + targetTop + "px";
+                                    $element.style.left = event.pageX - origX + targetLeft + "px";
+                                    ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                });
                             })
-                        }
-                        else if(target.hasClass("right-top-corner")){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.top = event.pageY + "px";
-                                $element.style.width = targetWidth + event.pageX - origX + "px";
-                                $element.style.height = targetHeight - event.pageY + origY + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
-                        }
-                        else if(target.hasClass("left-top-corner")){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.left = targetLeft + event.pageX - origX + "px";
-                                $element.style.top = event.pageY + "px";
-                                $element.style.width = targetWidth - event.pageX + origX + "px";
-                                $element.style.height = targetHeight - event.pageY + origY + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
-                        }
-                        else if(target.hasClass("left-bottom-corner")){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.left = event.pageX + "px";
-                                $element.style.width = targetWidth - event.pageX + origX + "px";
-                                $element.style.height = targetHeight + event.pageY - origY + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
+
                         }
 
-                    }
+                        if(target.parent().hasClass('resizeCorner')){
+                            if($option.resizable == false) {
+                                $document.find('body').removeClass('unselectable');
 
-                    if(target.parent().hasClass('resizeBar')){
-                        if($option.resizable == false)  { $document.find('body').removeClass('unselectable'); return;}
-                        if($option.onResize){
-                            $option.onResize();
-                            resizeStartFlag = true;
-                        }
-                        $document.find('body').addClass('unselectable');
-                        if(target.hasClass('left-bar')){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.left = targetLeft + event.pageX - origX + "px";
-                                $element.style.width = targetWidth - event.pageX + origX + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
-                        }
-                        else if(target.hasClass('right-bar')){
-                            $document.bind("mousemove", function (event) {
+                                return;
+                            }
+                            if($option.onResize){
+                                $option.onResize();
+                                resizeStartFlag = true;
+                            }
 
-                                $element.style.width = targetWidth + event.pageX - origX + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
+                            $document.find('body').addClass('unselectable');
+                            if(target.hasClass("right-bottom-corner")){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.height = targetHeight + event.pageY - origY + "px";
+                                        $element.style.width = targetWidth + event.pageX - origX + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass("right-top-corner")){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.top = event.pageY + "px";
+                                        $element.style.width = targetWidth + event.pageX - origX + "px";
+                                        $element.style.height = targetHeight - event.pageY + origY + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass("left-top-corner")){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.left = targetLeft + event.pageX - origX + "px";
+                                        $element.style.top = event.pageY + "px";
+                                        $element.style.width = targetWidth - event.pageX + origX + "px";
+                                        $element.style.height = targetHeight - event.pageY + origY + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass("left-bottom-corner")){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.left = event.pageX + "px";
+                                        $element.style.width = targetWidth - event.pageX + origX + "px";
+                                        $element.style.height = targetHeight + event.pageY - origY + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
 
-                            })
                         }
-                        else if(target.hasClass('top-bar')){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.top = event.pageY + "px";
-                                $element.style.height = targetHeight - event.pageY + origY + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
-                        }
-                        else if(target.hasClass('bottom-bar')){
-                            $document.bind("mousemove", function (event) {
-                                $element.style.height = targetHeight + event.pageY - origY + "px";
-                                ngPopupBuilder.updateParentScopeOptions(scope.option,element);
-                                ngPopupBuilder.callParentScopeApply(scope.$parent);
-                            })
-                        }
-                    }
 
-                    ngPopupBuilder.callParentScopeApply(scope.$parent);
+                        if(target.parent().hasClass('resizeBar')){
+                            if($option.resizable == false)  { $document.find('body').removeClass('unselectable'); return;}
+                            if($option.onResize){
+                                $option.onResize();
+                                resizeStartFlag = true;
+                            }
+                            $document.find('body').addClass('unselectable');
+                            if(target.hasClass('left-bar')){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.left = targetLeft + event.pageX - origX + "px";
+                                        $element.style.width = targetWidth - event.pageX + origX + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass('right-bar')){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.width = targetWidth + event.pageX - origX + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass('top-bar')){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function () {
+                                        $element.style.top = event.pageY + "px";
+                                        $element.style.height = targetHeight - event.pageY + origY + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                            else if(target.hasClass('bottom-bar')){
+                                $document.bind("mousemove", function (event) {
+                                    $timeout(function(){
+                                        $element.style.height = targetHeight + event.pageY - origY + "px";
+                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    });
+                                })
+                            }
+                        }
+                    });
 
                 });
 
                 element.bind("mouseup", function(event){
-                    if($option.onDragEnd && dragStartFlag){
-                        $option.onDragEnd();
-                        dragStartFlag = false;
-                        resizeStartFlag = false;
-                    }
-
-                    $document.find('body').removeClass('unselectable');
-                    $document.unbind("mousemove");
-
-                    ngPopupBuilder.callParentScopeApply(scope.$parent);
-                })
+                    $timeout(function () {
+                        if($option.onDragEnd && dragStartFlag){
+                            $option.onDragEnd();
+                            dragStartFlag = false;
+                            resizeStartFlag = false;
+                        }
+                        $document.find('body').removeClass('unselectable');
+                        $document.unbind("mousemove");
+                    });
+                });
 
             }
 

@@ -17,10 +17,10 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 '<div class="titleBar" ng-show="option.hasTitleBar">' +
                 '<span class="title">{{option.title}}</span>' +
                 '<div class="iconGroup">' +
-                '<span class="glyphicon glyphicon-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></span>' +
-                '<span class="glyphicon glyphicon-resize-full" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></span>' +
-                '<span class="glyphicon glyphicon-pushpin" ng-click="action.togglePin($event)" id="pinBtn"></span>' +
-                '<span class="glyphicon glyphicon-remove" ng-click="action.close($event)" id="closeBtn"></span>' +
+                '<i class="fa fa-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></i>' +
+                '<i class="fa fa-expand" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></i>' +
+                '<i class="fa fa-map-pin" ng-click="action.togglePin($event)" id="pinBtn"></i>' +
+                '<i class="fa fa-close" ng-click="action.close($event)" id="closeBtn"></i>' +
                 '</div>' +
                 '</div>' +
                 '<div class="content" ng-class="{contentNoBar:!option.hasTitleBar}">';
@@ -79,14 +79,14 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         options.position.left = $element.offsetLeft;
                         options.width = $element.offsetWidth;
                         options.height = $element.offsetHeight;
-                        angular.element(document.querySelector("#maxBtn")).removeClass('glyphicon-resize-full').addClass('glyphicon-resize-small');
+                        angular.element(document.querySelector("#maxBtn")).removeClass('fa-expand').addClass('fa-compress');
                     }
                     else{
                         $element.style.height = tempHeight + "px";
                         $element.style.width = tempWidth + "px";
                         options.width = $element.offsetWidth;
                         options.height = $element.offsetHeight;
-                        angular.element(document.querySelector("#maxBtn")).removeClass('glyphicon-resize-small').addClass('glyphicon-resize-full');
+                        angular.element(document.querySelector("#maxBtn")).removeClass('fa-compress').addClass('fa-expand');
                     }
 
                     options.isMaximized = !options.isMaximized;
@@ -99,7 +99,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         $element.getElementsByClassName('content')[0].style.display = 'none';
                         $element.style.height = $element.getElementsByClassName('titleBar')[0].style.height;
                         $element.style.width = '200px';
-                        angular.element(document.querySelector("#minBtn")).removeClass('glyphicon-minus').addClass('glyphicon-plus');
+                        angular.element(document.querySelector("#minBtn")).removeClass('fa-minus').addClass('fa-plus');
                     }
                     else{
                         $element.style.height = options.height + 'px';
@@ -107,7 +107,7 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         $element.style.top = options.position.top + 'px';
                         $element.style.left = options.position.left + 'px';
                         $element.getElementsByClassName('content')[0].style.display = 'block';
-                        angular.element(document.querySelector("#minBtn")).removeClass('glyphicon-plus').addClass('glyphicon-minus');
+                        angular.element(document.querySelector("#minBtn")).removeClass('fa-plus').addClass('fa-minus');
                         options.position.top =  $element.offsetTop;
                         options.position.left = $element.offsetLeft;
                     }
@@ -188,11 +188,6 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 }
             }
 
-        },
-        callParentScopeApply: function(scope){
-            if(!scope.$$phase){
-                scope.$digest()
-            }
         },
         updateParentScopeOptions: function(options,element){
             var $element = element[0];

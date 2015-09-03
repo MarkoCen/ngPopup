@@ -1,4 +1,4 @@
-@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css");
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
 
 .ngPopup{
     border : 1px solid lightgrey;
@@ -12,7 +12,7 @@
     -ms-user-select: none;
     user-select: none;
     border-radius: 5px;
-    z-index: 10;
+    z-index: 1100;
     position:absolute;
     background-color: white;
 }
@@ -28,7 +28,7 @@
 
 .ngPopup > .container >.titleBar {
     width:100%;
-    height:25px;
+    height:30px;
     position: relative;
     float:left;
     background-color: #f5f5f5;
@@ -138,16 +138,16 @@
     position:relative;
     float: right;
     left: -10px;
-    padding-top: 4px;
+    padding-top: 2px;
     padding-bottom: 2px;
 }
 
-.ngPopup .iconGroup > span {
+.ngPopup .iconGroup > i {
     position: relative;
     top: 0px;
     margin-left: 4px;
     font-size: 14px;
-    color: lightgrey;
+    color: grey;
     cursor: pointer;
 }
 
@@ -156,7 +156,7 @@
     color:grey;
     float: left;
     margin-left: 7px;
-    margin-top: 2px;
+    margin-top: 0px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
