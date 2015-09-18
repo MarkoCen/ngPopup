@@ -70,4 +70,4 @@ The MIT License
 [download]:https://github.com/MarkoCen/ngPopup/tree/master/dist
 [AngularJS]:https://angularjs.org/
 [Demo]:http://markocen.github.io/ngPopup/ngPopupDemo.html
-[API]:https://github.com/MarkoCen/ngPopup/wiki/ngPopup
+[API]:https://github.com/MarkoCen/ngPopup/wiki/API-:-Options
