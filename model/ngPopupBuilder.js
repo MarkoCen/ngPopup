@@ -68,8 +68,8 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                 },
                 maximize: function(isMax){
                     if(!isMax) {
-                        tempHeight = $element.offsetHeight;
-                        tempWidth  = $element.offsetWidth;
+                        tempHeight = $element.clientHeight;
+                        tempWidth  = $element.clientWidth;
                         $element.getElementsByClassName('content')[0].style.display = 'block';
                         $element.style.top = '5px';
                         $element.style.left = '5px';
@@ -77,15 +77,15 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                         $element.style.height = 'calc( 100vh - 10px )';
                         options.position.top = $element.offsetTop;
                         options.position.left = $element.offsetLeft;
-                        options.width = $element.offsetWidth;
-                        options.height = $element.offsetHeight;
+                        options.width = $element.clientWidth;
+                        options.height = $element.clientHeight;
                         angular.element(document.querySelector("#maxBtn")).removeClass('fa-expand').addClass('fa-compress');
                     }
                     else{
                         $element.style.height = tempHeight + "px";
                         $element.style.width = tempWidth + "px";
-                        options.width = $element.offsetWidth;
-                        options.height = $element.offsetHeight;
+                        options.width = $element.clientWidth;
+                        options.height = $element.clientHeight;
                         angular.element(document.querySelector("#maxBtn")).removeClass('fa-compress').addClass('fa-expand');
                     }
 
@@ -194,8 +194,8 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
             options.position.top =  $element.offsetTop;
             options.position.left = $element.offsetLeft;
             if($element.getElementsByClassName('content')[0].style.display != 'none'){
-                options.width = $element.offsetWidth;
-                options.height = $element.offsetHeight;
+                options.width = $element.clientWidth;
+                options.height = $element.clientHeight;
             }
         },
         updateElementSize: function(element, width, height){
