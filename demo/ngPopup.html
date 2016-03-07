@@ -50,7 +50,7 @@
             <li ng-repeat="item in msgList track by $index">{{item}}</li>
         </ul>
     </div>
-    
+
     <ng-pop-up option="ngPopupOption"></ng-pop-up>
     <ng-pop-up option="ngPopupOptionDemo2"></ng-pop-up>
 
@@ -59,9 +59,7 @@
         var demoApp = angular.module('demoApp', ['ngPopup']);
 
         demoApp.controller("demoCtrl", function ($scope) {
-            $scope.test = function (event) {
-                console.log(event)
-            }
+
             $scope.toggleResize = function () {
                 $scope.ngPopupOption.resizable = !$scope.ngPopupOption.resizable;
             }
@@ -90,11 +88,13 @@
 
             $scope.ngPopupOption = {
                 modelName: "myNgPopup",
-                width: 400,
-                height: 300,
+                width: 500,
+                height: 400,
                 hasTitleBar:true,
-                template: '<img src="http://www.omgubuntu.co.uk/wp-content/uploads/2014/03/Forever-Shady-S.jpg" style="width:100%;height:100%;">',
-                title: "Awesome Dialog",
+                template: '<iframe style="margin:1%;height:95%;width:95%;" ' +
+                'src="https://www.youtube.com/embed/QSGNFLv9qtw?controls=1&showinfo=0&autoplay=0" frameborder="0">' +
+                '</iframe>',
+                title: "Awesome Video",
                 resizable:true,
                 draggable: true,
                 position: { top : 250, left : 300},
@@ -122,32 +122,6 @@
                 onResize : function(){$scope.insertEventMessage('Resize Event Fired!')}
             }
 
-            $scope.ngPopupOptionDemo3 = {
-                modelName: "myNgPopup",
-                width: 700,
-                height: 500,
-                hasTitleBar:true,
-                template: '<iframe style="height:100%;width:100%;" src="https://www.youtube.com/embed/QSGNFLv9qtw?controls=1&showinfo=0&autoplay=1" frameborder="0"></iframe>',
-                title: "Floating Video Player",
-                resizable:true,
-                draggable: true,
-                position: { top : 950, left : 100}
-
-            }
-
-            $scope.ngPopupOptionDemo4 = {
-                modelName: "myNgPopup",
-                width: 350,
-                height: 400,
-                hasTitleBar:false,
-                template: '<div class="thumbnail" style="height:91%;width:100%;"><img src="http://www.bacancytechnology.com/wp-content/uploads/2015/02/AngularJS-Flat-Icon-Vector.png"><div class="caption"><h4>ngPopup</h4><p>light weight Angular Dialog</p><p><a class="btn btn-primary" href="https://github.com/MarkoCen/ngPopup" role="button">Source</a> <a href="https://github.com/MarkoCen/ngPopup/wiki" class="btn btn-default" role="button">API</a></p></div></div>',
-                title: "Floating Video Player",
-                resizable:false,
-                draggable: true,
-                isShow:false,
-                position: { top : 950, left : 100}
-
-            }
         })
     </script>
 </body>
