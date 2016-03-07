@@ -1,9 +1,15 @@
-ngPopup.directive("ngPopUp",[
+;(function(){
+    angular.module('ngPopup').directive("ngPopUp", NgPopup);
 
-    '$parse', '$document', '$timeout', '$templateCache', '$compile', 'ngPopupBuilder',
+    NgPopup.$inject = [
+        '$parse', '$document', '$timeout',
+        '$templateCache', '$compile', 'ngPopupBuilder'
+    ];
 
-    function($parse,$document, $timeout, $templateCache, $compile, ngPopupBuilder){
-
+    function NgPopup(
+        $parse,$document, $timeout,
+        $templateCache, $compile, ngPopupBuilder
+    ){
         return{
             restrict: "EA",
             scope:{
@@ -20,10 +26,10 @@ ngPopup.directive("ngPopUp",[
                 var resizeStartFlag = false
                 var initDone = false
                 var linkParams = {
-                        scope: scope,
-                        element: element,
-                        attrs: attrs
-                    };
+                    scope: scope,
+                    element: element,
+                    attrs: attrs
+                };
 
                 ngPopupBuilder.layoutInitAsync($option).then(function(html){
                     var compiledHtml = $compile(html)(scope);
@@ -184,4 +190,6 @@ ngPopup.directive("ngPopUp",[
             }
 
         }
-}]);
+    }
+})();
+

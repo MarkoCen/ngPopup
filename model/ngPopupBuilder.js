@@ -1,50 +1,171 @@
-ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile', function($q, $http, $document,$log, $compile){
-    var eventTrigger = false
-        ,tempHeight = 0
-        ,tempWidth = 0
-        ,ngPopupBuilder = {
+;(function(){
+    angular.module('ngPopup').factory('ngPopupBuilder', NgPopupBuilder);
 
-        layoutInitAsync: function(option){
-            var templateHtml = (option.template) ? option.template : ''
-                ,deferred = $q.defer()
-                ,html = '<div class="container">' +
-                '<div class="resizeCorner">' +
-                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
-                '</div>' +
-                '<div class="resizeBar">' +
-                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
-                '</div>' +
-                '<div class="titleBar" ng-show="option.hasTitleBar">' +
-                '<span class="title">{{option.title}}</span>' +
-                '<div class="iconGroup">' +
-                '<i class="fa fa-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></i>' +
-                '<i class="fa fa-expand" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></i>' +
-                '<i class="fa fa-map-pin" ng-click="action.togglePin($event)" id="pinBtn"></i>' +
-                '<i class="fa fa-close" ng-click="action.close($event)" id="closeBtn"></i>' +
-                '</div>' +
-                '</div>' +
-                '<div class="content" ng-class="{contentNoBar:!option.hasTitleBar}">';
-            if(option.templateUrl) {
-                $http.get(option.templateUrl).then(function(templateUrlHtml){
-                        html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
-                        deferred.resolve(html);
-                },
-                function(reason){
-                    $log.error(reason);
-                    deferred.reject(reason);
-                });
+    NgPopupBuilder.$inject = [
+        '$q', '$http', '$document', '$log', '$compile'
+    ];
 
+    function NgPopupBuilder($q, $http, $document,$log, $compile){
+        var eventTrigger = false
+            ,tempHeight = 0
+            ,tempWidth = 0
+            ,ngPopupBuilder = {
+
+            layoutInitAsync: __layoutInitAsync,
+            getDefaultMethods: __getDefaultMethods,
+            getDefaultOptions: __getDefaultOptions,
+            updateParentScopeOptions: __updateParentScopeOptions,
+            updateElementSize: __updateElementSize,
+            updateElementPosition: __updateElementPosition,
+            updateBindingValue: __updateBindingValue
+
+        };
+
+        return ngPopupBuilder;
+
+        function __updateBindingValue(newValue, oldValue, linkParams){
+            var scope = linkParams.scope
+                ,element = linkParams.element
+                ,attrs = linkParams.attrs
+                ,$element = element[0];
+
+            if(newValue.pinned){
+                $element.style.position = 'fixed';
             }
             else{
-                html += templateHtml + '</div>' + '</div>';
-                deferred.resolve(html);
+                $element.style.position = 'absolute';
             }
-            return deferred.promise;
 
-        },
-        getDefaultMethods: function(options,element){
+            if(!scope.option.isMinimized){
+                ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
+            }
+
+            if(newValue.position.top != oldValue.position.top || newValue.position.left != newValue.position.left){
+                $element.style.top = newValue.position.top + 'px';
+                $element.style.left = newValue.position.left + 'px';
+            }
+
+
+            if(newValue.isShow != oldValue.isShow && !eventTrigger){
+                if(newValue.isShow){
+                    if(newValue.onOpen){
+                        newValue.onOpen();
+                    }
+                }
+                else{
+                    if(newValue.onClose)
+                    {
+                        newValue.onClose();
+                    }
+                }
+            }
+            if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
+                if(newValue.onResize){
+                    newValue.onResize();
+                }
+            }
+
+            if(newValue.hasTitleBar != oldValue.hasTitleBar){
+                scope.option.hasTitleBar = newValue.hasTitleBar;
+            }
+
+            eventTrigger = false;
+        }
+
+        function __updateElementPosition(element, position){
             var $element = element[0];
-            var _defaultFunctions = {
+            if(typeof(position.top) == 'string') $element.style.top = position.top;
+            if(typeof(position.top) == 'number') $element.style.top = position.top + 'px';
+
+            if(typeof(position.left) == 'string') $element.style.left = position.left;
+            if(typeof(position.left) == 'number') $element.style.left = position.left + 'px';
+        }
+
+        function __updateElementSize(element, width, height){
+            var $element = element[0];
+            if(typeof(width) == 'string'){
+                if(width.slice(-1) == "%"){
+                    $element.style.width = width;
+                }else{
+                    $element.style.width = parseInt(width, 10) + "px";
+                }
+            }
+            if(typeof(width) == 'number') $element.style.width = width + 'px';
+
+            if(typeof(height) == 'string'){
+                if(height.slice(-1) == "%"){
+                    $element.style.height = height;
+                }else{
+                    $element.style.height = parseInt(height, 10) + "px";
+                }
+            }
+            if(typeof(height) == 'number') $element.style.height = height + 'px';
+        }
+
+        function __updateParentScopeOptions(options,element){
+            var $element = element[0];
+            options.position.top =  $element.offsetTop;
+            options.position.left = $element.offsetLeft;
+            if($element.getElementsByClassName('content')[0].style.display != 'none'){
+                options.width = $element.clientWidth;
+                options.height = $element.clientHeight;
+            }
+        }
+
+        function __getDefaultOptions(options){
+
+            if(options){
+                options.modelName = options.modelName || "ngPopup";
+                options.width = options.width || 100;
+                options.height = options.height || 100;
+                options.template = options.template || '';
+                options.templateUrl = options.templateUrl || null;
+                options.resizable = (options.resizable == null) ? true : options.resizable;
+                options.draggable = (options.draggable == null) ? true : options.draggable;
+                options.position = options.position || {top: 0, left: 0};
+                options.title = options.title || "Welcome to ngPopup!";
+                options.hasTitleBar = (options.hasTitleBar == null) ? true : options.hasTitleBar;
+                options.pinned = (options.pinned == null) ? false : options.pinned;
+                options.isShow = (options.isShow == null) ? true : options.isShow;
+                options.isMinimized = (options.isMinimized == null) ? false : options.isMinimized;
+                options.isMaximized = (options.isMaximized == null) ? false : options.isMaximized;
+                options.onOpen = options.onOpen || function(){};
+                options.onClose = options.onClose || function(){};
+                options.onDragStart = options.onDragStart || function () {};
+                options.onDragEnd = options.onDragEnd || function(){};
+                options.onResize = options.onResize || function () {};
+                return options;
+            }
+            else{
+                return {
+                    modelName : "myDialog",
+                    width : 100,
+                    height : 100,
+                    template: "",
+                    templateUrl : null,
+                    resizable : true,
+                    draggable : true,
+                    position : {
+                        top : -1,
+                        left : -1
+                    },
+                    title : "Welcome to ngPopup!",
+                    hasTitleBar : true,
+                    pinned : false,
+                    isShow : true,
+                    onOpen : function(){},
+                    onClose  : function(){},
+                    onDragStart : function(){},
+                    onDragEnd : function(){},
+                    onResize : function(){}
+                }
+            }
+
+        }
+
+        function __getDefaultMethods(options,element){
+            var $element = element[0];
+            return {
                 open: function(newPosition){
                     if(newPosition != null){
                         $element.style.top = newPosition.top + "px";
@@ -136,145 +257,47 @@ ngPopup.factory("ngPopupBuilder", ['$q', '$http', '$document', '$log', '$compile
                     return options.isMinimized;
                 }
             };
-
-            return _defaultFunctions;
-        },
-        getDefaultOptions: function(options){
-
-            if(options){
-                options.modelName = options.modelName || "ngPopup";
-                options.width = options.width || 100;
-                options.height = options.height || 100;
-                options.template = options.template || '';
-                options.templateUrl = options.templateUrl || null;
-                options.resizable = (options.resizable == null) ? true : options.resizable;
-                options.draggable = (options.draggable == null) ? true : options.draggable;
-                options.position = options.position || {top: 0, left: 0};
-                options.title = options.title || "Welcome to ngPopup!";
-                options.hasTitleBar = (options.hasTitleBar == null) ? true : options.hasTitleBar;
-                options.pinned = (options.pinned == null) ? false : options.pinned;
-                options.isShow = (options.isShow == null) ? true : options.isShow;
-                options.isMinimized = (options.isMinimized == null) ? false : options.isMinimized;
-                options.isMaximized = (options.isMaximized == null) ? false : options.isMaximized;
-                options.onOpen = options.onOpen || function(){};
-                options.onClose = options.onClose || function(){};
-                options.onDragStart = options.onDragStart || function () {};
-                options.onDragEnd = options.onDragEnd || function(){};
-                options.onResize = options.onResize || function () {};
-                return options;
-            }
-            else{
-                return {
-                    modelName : "myDialog",
-                    width : 100,
-                    height : 100,
-                    template: "",
-                    templateUrl : null,
-                    resizable : true,
-                    draggable : true,
-                    position : {
-                        top : -1,
-                        left : -1
-                    },
-                    title : "Welcome to ngPopup!",
-                    hasTitleBar : true,
-                    pinned : false,
-                    isShow : true,
-                    onOpen : function(){},
-                    onClose  : function(){},
-                    onDragStart : function(){},
-                    onDragEnd : function(){},
-                    onResize : function(){}
-                }
-            }
-
-        },
-        updateParentScopeOptions: function(options,element){
-            var $element = element[0];
-            options.position.top =  $element.offsetTop;
-            options.position.left = $element.offsetLeft;
-            if($element.getElementsByClassName('content')[0].style.display != 'none'){
-                options.width = $element.clientWidth;
-                options.height = $element.clientHeight;
-            }
-        },
-        updateElementSize: function(element, width, height){
-            var $element = element[0];
-            if(typeof(width) == 'string'){
-                if(width.slice(-1) == "%"){
-                    $element.style.width = width;
-                }else{
-                    $element.style.width = parseInt(width, 10) + "px";
-                }
-            }
-            if(typeof(width) == 'number') $element.style.width = width + 'px';
-
-            if(typeof(height) == 'string'){
-                if(height.slice(-1) == "%"){
-                    $element.style.height = height;
-                }else{
-                    $element.style.height = parseInt(height, 10) + "px";
-                }
-            }
-            if(typeof(height) == 'number') $element.style.height = height + 'px';
-        },
-        updateElementPosition: function(element, position){
-            var $element = element[0];
-            if(typeof(position.top) == 'string') $element.style.top = position.top;
-            if(typeof(position.top) == 'number') $element.style.top = position.top + 'px';
-
-            if(typeof(position.left) == 'string') $element.style.left = position.left;
-            if(typeof(position.left) == 'number') $element.style.left = position.left + 'px';
-        },
-        updateBindingValue: function(newValue, oldValue, linkParams){
-            var scope = linkParams.scope
-                ,element = linkParams.element
-                ,attrs = linkParams.attrs
-                ,$element = element[0];
-
-            if(newValue.pinned){
-                $element.style.position = 'fixed';
-            }
-            else{
-                $element.style.position = 'absolute';
-            }
-
-            if(!scope.option.isMinimized){
-                ngPopupBuilder.updateElementSize(element, newValue.width, newValue.height);
-            }
-
-            if(newValue.position.top != oldValue.position.top || newValue.position.left != newValue.position.left){
-                $element.style.top = newValue.position.top + 'px';
-                $element.style.left = newValue.position.left + 'px';
-            }
-
-
-            if(newValue.isShow != oldValue.isShow && !eventTrigger){
-                if(newValue.isShow){
-                    if(newValue.onOpen){
-                        newValue.onOpen();
-                    }
-                }
-                else{
-                    if(newValue.onClose)
-                    {
-                        newValue.onClose();
-                    }
-                }
-            }
-            if(((newValue.width != oldValue.width) || (newValue.height != oldValue.height))){
-                if(newValue.onResize){
-                    newValue.onResize();
-                }
-            }
-
-            if(newValue.hasTitleBar != oldValue.hasTitleBar){
-               scope.option.hasTitleBar = newValue.hasTitleBar;
-            }
-
-            eventTrigger = false;
         }
-    };
 
-    return ngPopupBuilder;
-}]);
+        function __layoutInitAsync(option){
+            var templateHtml = (option.template) ? option.template : ''
+                ,deferred = $q.defer()
+                ,html = '<div class="container">' +
+                '<div class="resizeCorner">' +
+                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '</div>' +
+                '<div class="resizeBar">' +
+                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '</div>' +
+                '<div class="titleBar" ng-show="option.hasTitleBar">' +
+                '<span class="title">{{option.title}}</span>' +
+                '<div class="iconGroup">' +
+                '<i class="fa fa-minus" ng-click="action.minimize(option.isMinimized)" id="minBtn"></i>' +
+                '<i class="fa fa-expand" ng-click="action.maximize(option.isMaximized)" id="maxBtn"></i>' +
+                '<i class="fa fa-map-pin" ng-click="action.togglePin($event)" id="pinBtn"></i>' +
+                '<i class="fa fa-close" ng-click="action.close($event)" id="closeBtn"></i>' +
+                '</div>' +
+                '</div>' +
+                '<div class="content" ng-class="{contentNoBar:!option.hasTitleBar}">';
+            if(option.templateUrl) {
+                $http.get(option.templateUrl).then(function(templateUrlHtml){
+                        html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
+                        deferred.resolve(html);
+                    },
+                    function(reason){
+                        $log.error(reason);
+                        deferred.reject(reason);
+                    });
+
+            }
+            else{
+                html += templateHtml + '</div>' + '</div>';
+                deferred.resolve(html);
+            }
+            return deferred.promise;
+
+        }
+
+
+    }
+})();
