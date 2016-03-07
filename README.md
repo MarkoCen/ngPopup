@@ -28,6 +28,11 @@ Then add dependency in your AngularJS App :
 angular.module("yourApp",["ngPopup"]);
 ```
 
+##Build
+ngPopup use Gulp to release , make sure to run gulp after modified the source code or theme,
+```
+gulp
+```
 ##Quick-start Example
 
 1 Insert ngPopup directive in DOM, and specify option object by ```option``` attribute :
