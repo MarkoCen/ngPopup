@@ -43,7 +43,6 @@ gulp
 
 ```javascript
 $scope.ngPopupConfig = {
-	modelName: "myNgPopup",
     width: $scope.inputWidth,
     height:$scope.inputHeight,
     templateUrl:"../views/ngPopupContents.html",
