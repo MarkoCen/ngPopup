@@ -1,7 +1,7 @@
 /**
  * ng-popup - Angular modeless dialog without jQuery dependency
  * @author Marko Cen
- * @version v0.4.2
+ * @version v0.5.0
  * @link http://markocen.github.io/ngPopup/ngPopupDemo.html
  * @license MIT
  */
