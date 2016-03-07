@@ -1,7 +1,7 @@
 #ngPopup
 -----
 
-Light-weight (~3kb gzipped) modeless dialog for Angular without jQuery dependency, supports Angular two-way binding for most dialog properties(width, height, position...), and has full customized theme.
+Light-weight (~3kb gzipped) modaless dialog for Angular without jQuery dependency, supports Angular two-way binding for most dialog properties(width, height, position...), and has full customized theme.
 
 [Demo]
 
