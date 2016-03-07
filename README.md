@@ -1,7 +1,7 @@
 #ngPopup
 -----
 
-ngPopup is a light-weight modeless dialog for Angular, it is jQuery-independent and has only dependency on AngularJS. It supports angular two-way binding on dialog properties(width, height, position...), and has full customized theme.
+Light-weight (~3kb gzipped) modeless dialog for Angular without jQuery dependency, supports Angular two-way binding for most dialog properties(width, height, position...), and has full customized theme.
 
 [Demo]
 
