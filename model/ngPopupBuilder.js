@@ -2,13 +2,14 @@
     angular.module('ngPopup').factory('ngPopupBuilder', NgPopupBuilder);
 
     NgPopupBuilder.$inject = [
-        '$q', '$http', '$document', '$log', '$compile'
+        '$q', '$http', '$log'
     ];
 
-    function NgPopupBuilder($q, $http, $document,$log, $compile){
+    function NgPopupBuilder($q, $http,$log){
         var eventTrigger = false
             ,tempHeight = 0
             ,tempWidth = 0
+            ,lastWindowScrollTop = 0
             ,ngPopupBuilder = {
 
             layoutInitAsync: __layoutInitAsync,
@@ -23,6 +24,12 @@
 
         return ngPopupBuilder;
 
+        function __getWindowScrollTop(){
+            return  (window.pageYOffset !== undefined) ?
+                window.pageYOffset :
+                (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        }
+
         function __updateBindingValue(newValue, oldValue, linkParams){
             var scope = linkParams.scope
                 ,element = linkParams.element
@@ -31,9 +38,12 @@
 
             if(newValue.pinned){
                 $element.style.position = 'fixed';
+                lastWindowScrollTop = __getWindowScrollTop();
             }
             else{
                 $element.style.position = 'absolute';
+                $element.style.top =
+                    newValue.position.top + __getWindowScrollTop() - lastWindowScrollTop + 'px';
             }
 
             if(!scope.option.isMinimized){
@@ -107,8 +117,8 @@
             options.position.top =  $element.offsetTop;
             options.position.left = $element.offsetLeft;
             if($element.getElementsByClassName('content')[0].style.display != 'none'){
-                options.width = $element.clientWidth;
-                options.height = $element.clientHeight;
+                options.width = $element.offsetWidth;
+                options.height = $element.offsetHeight;
             }
         }
 
@@ -189,8 +199,8 @@
                 },
                 maximize: function(isMax){
                     if(!isMax) {
-                        tempHeight = $element.clientHeight;
-                        tempWidth  = $element.clientWidth;
+                        tempHeight = $element.offsetHeight;
+                        tempWidth  = $element.offsetWidth;
                         $element.getElementsByClassName('content')[0].style.display = 'block';
                         $element.style.top = '5px';
                         $element.style.left = '5px';
@@ -198,15 +208,15 @@
                         $element.style.height = 'calc( 100vh - 10px )';
                         options.position.top = $element.offsetTop;
                         options.position.left = $element.offsetLeft;
-                        options.width = $element.clientWidth;
-                        options.height = $element.clientHeight;
+                        options.width = $element.offsetWidth;
+                        options.height = $element.offsetHeight;
                         angular.element(document.querySelector("#maxBtn")).removeClass('fa-expand').addClass('fa-compress');
                     }
                     else{
                         $element.style.height = tempHeight + "px";
                         $element.style.width = tempWidth + "px";
-                        options.width = $element.clientWidth;
-                        options.height = $element.clientHeight;
+                        options.width = $element.offsetWidth;
+                        options.height = $element.offsetHeight;
                         angular.element(document.querySelector("#maxBtn")).removeClass('fa-compress').addClass('fa-expand');
                     }
 
@@ -263,12 +273,21 @@
             var templateHtml = (option.template) ? option.template : ''
                 ,deferred = $q.defer()
                 ,html = '<div class="container">' +
+
                 '<div class="resizeCorner">' +
-                '<div class="left-top-corner"></div>' + '<div class="left-bottom-corner"></div>' + '<div class="right-top-corner"></div>' + '<div class="right-bottom-corner"></div>' +
+                '<div class="left-top-corner"></div>' +
+                '<div class="left-bottom-corner"></div>' +
+                '<div class="right-top-corner"></div>' +
+                '<div class="right-bottom-corner"></div>' +
                 '</div>' +
+
                 '<div class="resizeBar">' +
-                '<div class="top-bar"></div>' + '<div class="right-bar"></div>' + '<div class="bottom-bar"></div>' + '<div class="left-bar"></div>' +
+                '<div class="top-bar"></div>' +
+                '<div class="right-bar"></div>' +
+                '<div class="bottom-bar"></div>' +
+                '<div class="left-bar"></div>' +
                 '</div>' +
+
                 '<div class="titleBar" ng-show="option.hasTitleBar">' +
                 '<span class="title">{{option.title}}</span>' +
                 '<div class="iconGroup">' +
@@ -278,23 +297,26 @@
                 '<i class="fa fa-close" ng-click="action.close($event)" id="closeBtn"></i>' +
                 '</div>' +
                 '</div>' +
+
                 '<div class="content" ng-class="{contentNoBar:!option.hasTitleBar}">';
             if(option.templateUrl) {
                 $http.get(option.templateUrl).then(function(templateUrlHtml){
-                        html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
-                        deferred.resolve(html);
-                    },
-                    function(reason){
-                        $log.error(reason);
-                        deferred.reject(reason);
-                    });
+                    html += templateHtml + templateUrlHtml.data + '</div>' + '</div>';
+                    deferred.resolve(html);
+                },
+                function(reason){
+                    $log.error(reason);
+                    deferred.reject(reason);
+                });
+
+                return deferred.promise;
 
             }
             else{
                 html += templateHtml + '</div>' + '</div>';
-                deferred.resolve(html);
+                return html;
             }
-            return deferred.promise;
+
 
         }
 

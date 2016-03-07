@@ -1,7 +1,7 @@
 {
   "name": "ng-popup",
   "description": "A modeless dialog for AngularJS",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "homepage": "https://github.com/MarkoCen/ngPopup",
   "main": ["dist/ngPopup.min.js", "dist/ngPopup.min.css"],
   "license": "MIT",

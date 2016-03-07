@@ -2,13 +2,13 @@
     angular.module('ngPopup').directive("ngPopUp", NgPopup);
 
     NgPopup.$inject = [
-        '$parse', '$document', '$timeout',
-        '$templateCache', '$compile', 'ngPopupBuilder'
+        '$document', '$timeout', '$q',
+        '$compile', 'ngPopupBuilder'
     ];
 
     function NgPopup(
-        $parse,$document, $timeout,
-        $templateCache, $compile, ngPopupBuilder
+        $document, $timeout, $q,
+        $compile, ngPopupBuilder
     ){
         return{
             restrict: "EA",
@@ -19,33 +19,48 @@
             template:'<div class="ngPopup" ng-show="option.isShow"></div>',
             link: function(scope, element, attrs){
 
-                var $element = element[0]
-                var $option = ngPopupBuilder.getDefaultOptions(scope.option)
-                var modelName = $option.modelName
-                var dragStartFlag = false
-                var resizeStartFlag = false
-                var initDone = false
-                var linkParams = {
-                    scope: scope,
-                    element: element,
-                    attrs: attrs
-                };
+                var self = scope
+                    ,$element = element[0]
+                    ,$option = ngPopupBuilder.getDefaultOptions(self.option)
+                    ,dragStartFlag = false
+                    ,resizeStartFlag = false
+                    ,initDone = false
+                    ,linkParams = {
+                        scope: self,
+                        element: element,
+                        attrs: attrs
+                    };
 
-                ngPopupBuilder.layoutInitAsync($option).then(function(html){
-                    var compiledHtml = $compile(html)(scope);
+                $q.when(ngPopupBuilder.layoutInitAsync($option)).then(function(html){
+                    var compiledHtml = $compile(html)(self);
                     element.append(compiledHtml);
                     ngPopupBuilder.updateBindingValue($option, ngPopupBuilder.getDefaultOptions(), linkParams);
                     initDone = true;
                 });
 
-                scope.$watch('option',function(newValue, oldValue){
+                self.$watch('option',function(newValue, oldValue){
                     if(initDone) ngPopupBuilder.updateBindingValue(newValue,oldValue, linkParams);
                 },true);
 
-                scope.action = ngPopupBuilder.getDefaultMethods($option,element);
+                self.action = ngPopupBuilder.getDefaultMethods($option,element);
 
-                element.bind("mousedown", function(event){
+                self.mouseMoveHandler = angular.noop;
 
+                self.mouseUpHandler = function mouseUpHandler(){
+
+                    $timeout(function () {
+                        if($option.onDragEnd && dragStartFlag){
+                            $option.onDragEnd();
+                            dragStartFlag = false;
+                            resizeStartFlag = false;
+                        }
+                        $document.find('body').removeClass('unselectable');
+                        $document.off("mousemove", self.mouseMoveHandler);
+                    });
+
+                };
+
+                self.mouseDownHandler = function mouseDownHandler(event){
 
                     $timeout(function () {
                         var target = angular.element(event.target)
@@ -56,21 +71,29 @@
                             ,origY = event.pageY
                             ,origX = event.pageX;
 
-                        if(target.hasClass('titleBar') || target.hasClass('title') || target.parent().hasClass('contentNoBar') || target.hasClass('contentNoBar')) {
+                        if(target.hasClass('titleBar')
+                            || target.hasClass('title')
+                            || target.parent().hasClass('contentNoBar')
+                            || target.hasClass('contentNoBar')
+                        ) {
 
                             if($option.draggable == false) return;
                             if($option.onDragStart){
                                 $option.onDragStart();
                                 dragStartFlag = true;
                             }
-                            $document.find('body').addClass('unselectable');
-                            $document.bind("mousemove", function (event) {
+
+                            self.mouseMoveHandler = function (event) {
                                 $timeout(function () {
                                     $element.style.top = event.pageY - origY + targetTop + "px";
                                     $element.style.left = event.pageX - origX + targetLeft + "px";
-                                    ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                    ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                 });
-                            })
+                            };
+
+                            $document.find('body').addClass('unselectable');
+
+                            $document.on("mousemove", self.mouseMoveHandler)
 
                         }
 
@@ -86,47 +109,49 @@
                             }
 
                             $document.find('body').addClass('unselectable');
+
                             if(target.hasClass("right-bottom-corner")){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.height = targetHeight + event.pageY - origY + "px";
                                         $element.style.width = targetWidth + event.pageX - origX + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass("right-top-corner")){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.top = event.pageY + "px";
                                         $element.style.width = targetWidth + event.pageX - origX + "px";
                                         $element.style.height = targetHeight - event.pageY + origY + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass("left-top-corner")){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.left = targetLeft + event.pageX - origX + "px";
                                         $element.style.top = event.pageY + "px";
                                         $element.style.width = targetWidth - event.pageX + origX + "px";
                                         $element.style.height = targetHeight - event.pageY + origY + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass("left-bottom-corner")){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.left = event.pageX + "px";
                                         $element.style.width = targetWidth - event.pageX + origX + "px";
                                         $element.style.height = targetHeight + event.pageY - origY + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
 
+                            $document.on("mousemove", self.mouseMoveHandler)
                         }
 
                         if(target.parent().hasClass('resizeBar')){
@@ -135,57 +160,58 @@
                                 $option.onResize();
                                 resizeStartFlag = true;
                             }
+
                             $document.find('body').addClass('unselectable');
+
                             if(target.hasClass('left-bar')){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.left = targetLeft + event.pageX - origX + "px";
                                         $element.style.width = targetWidth - event.pageX + origX + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass('right-bar')){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.width = targetWidth + event.pageX - origX + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass('top-bar')){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function () {
                                         $element.style.top = event.pageY + "px";
                                         $element.style.height = targetHeight - event.pageY + origY + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
                             else if(target.hasClass('bottom-bar')){
-                                $document.bind("mousemove", function (event) {
+                                self.mouseMoveHandler = function (event) {
                                     $timeout(function(){
                                         $element.style.height = targetHeight + event.pageY - origY + "px";
-                                        ngPopupBuilder.updateParentScopeOptions(scope.option,element);
+                                        ngPopupBuilder.updateParentScopeOptions(self.option,element);
                                     });
-                                })
+                                }
                             }
+
+                            $document.on("mousemove", self.mouseMoveHandler)
                         }
                     });
+                };
 
-                });
+                element.on("mousedown", self.mouseDownHandler);
 
-                element.bind("mouseup", function(event){
-                    $timeout(function () {
-                        if($option.onDragEnd && dragStartFlag){
-                            $option.onDragEnd();
-                            dragStartFlag = false;
-                            resizeStartFlag = false;
-                        }
-                        $document.find('body').removeClass('unselectable');
-                        $document.unbind("mousemove");
-                    });
-                });
+                element.on("mouseup", self.mouseUpHandler);
+
+                self.$on('$destroy', function(){
+                    element.off("mousedown", self.mouseDownHandler);
+                    element.off("mouseup", self.mouseUpHandler);
+                    $document.off("mousemove", self.mouseMoveHandler);
+                })
 
             }
 

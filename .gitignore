@@ -8,3 +8,4 @@ tmp
 e2e-tests/
 views/
 lib/
+npm-debug.log
